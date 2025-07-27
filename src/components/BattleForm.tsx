@@ -31,7 +31,7 @@ interface BattleFormProps {
     selectedModels: string[];
     responses?: {
       retornos_llms: string;
-      retono_juiz: string;
+      retorno_juiz: string; // ✅ CORRIGIDO: era "retono_juiz"
       resposta_deepseek: string;
       resposta_gpt: string;
       resposta_claude: string;
@@ -80,12 +80,15 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
         if (response.ok) {
           const responseData = await response.json();
           
+          // Debug: Log para verificar estrutura dos dados recebidos
+          console.log("🔍 Dados recebidos do webhook:", responseData);
+          
           // Pass the webhook response to the parent component with specific variables
           onStartBattle({
             ...battleData,
             responses: {
               retornos_llms: responseData.retornos_llms || "",
-              retono_juiz: responseData.retorno_juiz || "",
+              retorno_juiz: responseData.retorno_juiz || "", // ✅ CORRIGIDO: era "retono_juiz"
               resposta_deepseek: responseData.resposta_deepseek || "",
               resposta_gpt: responseData.resposta_gpt || "",
               resposta_claude: responseData.resposta_claude || ""
