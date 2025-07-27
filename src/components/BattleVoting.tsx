@@ -126,27 +126,27 @@ export default function BattleVoting({
   };
 
   return (
-    <div className="space-apple-lg">
+    <div className="space-minimal-lg">
       {/* Header */}
-      <div className="text-center space-apple-md">
-        <h1 className="text-apple-title">Choose the Best Response</h1>
-        <p className="text-apple-body max-w-2xl mx-auto">
+      <div className="text-center space-minimal-md">
+        <h1 className="text-minimal-title text-gradient-purple">Choose the Best Response</h1>
+        <p className="text-minimal-body max-w-2xl mx-auto">
           Vote for the response you think is best. Models are hidden until you reveal them.
         </p>
       </div>
 
       {/* Prompt Display */}
       <div className="max-w-4xl mx-auto">
-        <Card className="card-apple">
+        <Card className="card-minimal">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-apple-subtitle">Prompt</h3>
-              <Badge variant="outline" className="rounded-full">
+              <h3 className="text-minimal-subtitle">Prompt</h3>
+              <Badge variant="outline" className="rounded-full bg-primary/20 text-primary border-primary/30">
                 {category}
               </Badge>
             </div>
-            <div className="card-apple p-4 bg-secondary/30">
-              <p className="text-apple-body">{prompt}</p>
+            <div className="card-minimal p-4 gradient-purple-subtle border border-primary/20">
+              <p className="text-minimal-body text-foreground">{prompt}</p>
             </div>
           </CardContent>
         </Card>
@@ -155,7 +155,7 @@ export default function BattleVoting({
       {/* Status Messages */}
       {processedResponses.length === 0 && (
         <div className="max-w-4xl mx-auto">
-          <Card className="card-apple">
+          <Card className="card-minimal">
             <CardContent className="p-6">
               <div className="status-warning rounded-xl p-4">
                 <div className="font-medium mb-2">⚠️ No responses processed</div>
@@ -170,7 +170,7 @@ export default function BattleVoting({
 
       {processedResponses.length > 0 && (
         <div className="max-w-4xl mx-auto">
-          <Card className="card-apple">
+          <Card className="card-minimal">
             <CardContent className="p-6">
               <div className="status-success rounded-xl p-4">
                 <div className="font-medium mb-1">✅ Responses ready</div>
@@ -189,20 +189,20 @@ export default function BattleVoting({
           {processedResponses.map((response) => (
             <Card 
               key={response.id}
-              className={`card-apple transition-all duration-300 cursor-pointer ${
+              className={`vote-card-minimal transition-all duration-300 cursor-pointer border ${
                 selectedVote === response.id
-                  ? 'ring-2 ring-primary bg-primary/5 scale-[1.02]'
-                  : 'hover:scale-[1.01] hover:shadow-lg'
+                  ? 'ring-2 ring-primary bg-primary/10 scale-[1.02] border-primary/50 shadow-2xl shadow-primary/20'
+                  : 'hover:scale-[1.01] hover:shadow-2xl hover:shadow-primary/5 border-border/30'
               }`}
               onClick={() => !votingComplete && !selectedVote && handleVote(response.id)}
             >
               <CardHeader className="pb-4">
                 <CardTitle className="flex items-center justify-between">
-                  <span className="text-lg font-semibold">
+                  <span className="text-lg font-semibold text-foreground">
                     Response {getResponseLabel(response)}
                   </span>
                   {showReveal && response.modelName && (
-                    <Badge className="bg-primary text-primary-foreground rounded-full">
+                    <Badge className="gradient-purple text-white rounded-full">
                       {response.modelName}
                     </Badge>
                   )}
@@ -212,9 +212,9 @@ export default function BattleVoting({
                 </CardTitle>
               </CardHeader>
               
-              <CardContent className="space-apple-sm">
+              <CardContent className="space-minimal-sm">
                 {/* Response Content */}
-                <div className="card-apple p-4 bg-secondary/30 max-h-80 overflow-y-auto scrollbar-apple">
+                <div className="card-minimal p-4 bg-secondary/30 max-h-80 overflow-y-auto scrollbar-minimal border border-border/20">
                   <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
                     {response.content}
                   </div>
@@ -239,7 +239,7 @@ export default function BattleVoting({
                       e.stopPropagation();
                       handleVote(response.id);
                     }}
-                    className="btn-apple-primary w-full gap-2"
+                    className="btn-minimal-primary w-full gap-2 shadow-lg shadow-primary/25"
                   >
                     <Heart className="w-4 h-4" />
                     Vote for this
@@ -256,7 +256,7 @@ export default function BattleVoting({
 
                 {/* Winner Badge */}
                 {votingComplete && selectedVote === response.id && (
-                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-3 text-center font-medium">
+                  <div className="gradient-purple text-white rounded-xl p-3 text-center font-medium shadow-lg">
                     🏆 Your Winner
                   </div>
                 )}
@@ -271,7 +271,7 @@ export default function BattleVoting({
         <div className="text-center">
           <button
             onClick={handleReveal}
-            className="btn-apple-secondary px-8 py-4 text-base gap-3"
+            className="btn-minimal-secondary px-8 py-4 text-base gap-3 hover:bg-secondary"
           >
             <Eye className="w-5 h-5" />
             Reveal Models
@@ -282,41 +282,41 @@ export default function BattleVoting({
       {/* Post-Voting Summary */}
       {showReveal && (
         <div className="max-w-4xl mx-auto">
-          <Card className="card-apple">
-            <CardContent className="p-8 text-center space-apple-md">
-              <div className="space-apple-sm">
-                <h3 className="text-apple-title">🎉 Comparison Complete!</h3>
-                <p className="text-apple-body">
+          <Card className="card-minimal">
+            <CardContent className="p-8 text-center space-minimal-md">
+              <div className="space-minimal-sm">
+                <h3 className="text-minimal-title text-gradient-purple">🎉 Comparison Complete!</h3>
+                <p className="text-minimal-body">
                   Thank you for contributing to our AI model rankings.
                   Your vote helps others choose the best model for their needs.
                 </p>
               </div>
               
               {/* Results Summary */}
-              <div className="card-apple p-6 bg-secondary/30">
-                <h4 className="font-semibold mb-4">Comparison Summary</h4>
+              <div className="card-minimal p-6 gradient-purple-subtle border border-primary/20">
+                <h4 className="font-semibold mb-4 text-foreground">Comparison Summary</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
-                    <div className="font-semibold">Response A</div>
+                    <div className="font-semibold text-foreground">Response A</div>
                     <div className="text-muted-foreground">Model A</div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold">Response B</div>
+                    <div className="font-semibold text-foreground">Response B</div>
                     <div className="text-muted-foreground">Model B</div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold">Response C</div>
+                    <div className="font-semibold text-foreground">Response C</div>
                     <div className="text-muted-foreground">Model C</div>
                   </div>
                 </div>
               </div>
               
               <div className="flex flex-wrap justify-center gap-4">
-                <button className="btn-apple-primary gap-2">
+                <button className="btn-minimal-primary gap-2 shadow-lg shadow-primary/25">
                   <Heart className="w-4 h-4" />
                   New Comparison
                 </button>
-                <button className="btn-apple-secondary gap-2">
+                <button className="btn-minimal-secondary gap-2">
                   View Rankings
                 </button>
               </div>
