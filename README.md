@@ -1,73 +1,197 @@
-# Welcome to your Lovable project
+# 🟣⚫ LLM Arena - AI Battle Platform
 
-## Project info
+A modern, minimalist platform for comparing AI language models through interactive battles. Built with React, TypeScript, and Tailwind CSS with a dark purple theme.
 
-**URL**: https://lovable.dev/projects/dbfa91b9-b38d-4ecf-8d6d-7aa742850c1e
+## ✨ Features
 
-## How can I edit this code?
+- **AI Model Battles**: Compare responses from multiple LLMs (DeepSeek, GPT-4, Claude-3)
+- **Webhook Integration**: Real-time processing through N8N workflows
+- **Minimalist Design**: Apple-inspired dark theme with purple accents
+- **Real-time Voting**: Interactive voting system with live results
+- **Judge Analysis**: AI-powered analysis of model responses
+- **Responsive Design**: Works perfectly on desktop and mobile
 
-There are several ways of editing your application.
+## 🚀 Quick Start
 
-**Use Lovable**
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/dbfa91b9-b38d-4ecf-8d6d-7aa742850c1e) and start prompting.
+### Installation
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/klaus-deor/llm-clash-51.git
+   cd llm-clash-51
+   ```
 
-**Use your preferred IDE**
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. **Configure environment** (optional)
+   ```bash
+   cp .env.example .env
+   # Edit .env with your webhook URL if needed
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4. **Start development server**
+   ```bash
+   npm run dev
+   ```
 
-Follow these steps:
+5. **Open your browser**
+   ```
+   http://localhost:8080
+   ```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🎨 Design Theme
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+The application features a minimalist design inspired by Apple's design language:
 
-# Step 3: Install the necessary dependencies.
-npm i
+- **Primary Colors**: Deep purple (#7C3AED) and pure black (#000000)
+- **Cards**: Dark purple (#0F0F17) with subtle borders
+- **Typography**: Clean, hierarchical text system
+- **Animations**: Smooth, 200-300ms transitions
+- **Glass Effects**: Backdrop blur for modern aesthetics
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+## 🔧 Configuration
+
+### Webhook Setup
+
+The app connects to an N8N webhook for AI processing. Configure your webhook URL in the environment:
+
+```env
+VITE_WEBHOOK_URL=https://your-n8n-instance.com/webhook/your-endpoint
 ```
 
-**Edit a file directly in GitHub**
+### Expected Webhook Response Format
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```json
+[{
+  "retorno_juiz": "Judge analysis here...",
+  "resposta_a": "First AI response...",
+  "resposta_b": "Second AI response...", 
+  "resposta_c": "Third AI response..."
+}]
+```
 
-**Use GitHub Codespaces**
+## 🛠️ Development
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Project Structure
 
-## What technologies are used for this project?
+```
+src/
+├── components/          # React components
+│   ├── BattleForm.tsx  # Battle creation form
+│   ├── BattleVoting.tsx # Voting interface
+│   └── ui/             # Reusable UI components
+├── pages/              # Page components
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+├── index.css           # Base styles with CSS variables
+└── force-colors.css    # Color override system
+```
 
-This project is built with:
+### Available Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+```
 
-## How can I deploy this project?
+### Key Features Implementation
 
-Simply open [Lovable](https://lovable.dev/projects/dbfa91b9-b38d-4ecf-8d6d-7aa742850c1e) and click on Share -> Publish.
+#### Color System
+- **CSS Variables**: Base color definitions in `index.css`
+- **Force Override**: Complete color enforcement in `force-colors.css`
+- **Tailwind Integration**: Custom color tokens in `tailwind.config.ts`
 
-## Can I connect a custom domain to my Lovable project?
+#### Webhook Integration
+- **Array Processing**: Handles N8N array response format
+- **Error Handling**: Robust error management with fallbacks
+- **Debug Logging**: Console logs for development debugging
 
-Yes, you can!
+#### Responsive Design
+- **Mobile-first**: Optimized for touch interfaces
+- **Breakpoints**: Tailwind responsive utilities
+- **Flexible Layout**: CSS Grid and Flexbox
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 🔒 Security
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- **Input Validation**: All user inputs are validated
+- **Error Boundaries**: React error boundaries for stability
+- **CORS Handling**: Proper cross-origin request management
+- **Environment Variables**: Sensitive data in environment files
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Build Errors**
+   - Ensure all dependencies are installed: `npm install`
+   - Clear node_modules and reinstall if needed
+
+2. **Webhook Not Working**
+   - Check console for network errors
+   - Verify webhook URL in environment variables
+   - Ensure N8N endpoint is accessible
+
+3. **Colors Not Applied**
+   - Verify both CSS files are imported in `main.tsx`
+   - Check browser cache (hard refresh)
+   - Inspect element to see computed styles
+
+4. **TypeScript Errors**
+   - Run `npm run lint` to see specific issues
+   - Ensure all imports have correct paths
+   - Check `tsconfig.json` configuration
+
+## 📦 Deployment
+
+### Bolt.new Integration
+
+This project is optimized for Bolt.new:
+
+1. **Import Repository**
+   ```
+   https://github.com/klaus-deor/llm-clash-51
+   ```
+
+2. **Auto-sync Active**
+   - Changes sync automatically
+   - No manual deployment needed
+
+### Manual Deployment
+
+```bash
+npm run build
+# Deploy 'dist' folder to your hosting service
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Commit changes: `git commit -am 'Add feature'`
+4. Push to branch: `git push origin feature-name`
+5. Submit a pull request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🔗 Links
+
+- **Repository**: https://github.com/klaus-deor/llm-clash-51
+- **Live Demo**: Import into Bolt.new for instant preview
+- **Issues**: Report bugs and feature requests in GitHub Issues
+
+---
+
+**Built with ❤️ by Klaus Deor**
+
+*A minimalist AI battle platform with Apple-inspired design and purple theme*
