@@ -43,64 +43,88 @@ export default function BattleVoting({
     onReveal();
   };
 
-  // ✅ MAPEAMENTO FIXO: A=DeepSeek, B=GPT, C=Claude
-  const parseFixedLLMResponses = (webhookResponses: any) => {
+  // ✅ PROCESSAR FORMATO CORRETO DO WEBHOOK (resposta_a, resposta_b, resposta_c)
+  const parseWebhookResponses = (webhookResponses: any) => {
     const fixedResponses: BattleResponse[] = [];
     
-    // RESPOSTA A - SEMPRE DEEPSEEK
-    if (webhookResponses?.resposta_deepseek) {
-      fixedResponses.push({
-        id: "response-a-deepseek",
-        content: webhookResponses.resposta_deepseek.trim(),
-        responseTime: 2.1,
-        cost: 0.005,
-        modelName: "DeepSeek",
-        position: "A"
-      });
+    if (!webhookResponses) {
+      console.log("⚠️ Nenhuma resposta do webhook encontrada");
+      return [];
     }
     
-    // RESPOSTA B - SEMPRE GPT
-    if (webhookResponses?.resposta_gpt) {
-      fixedResponses.push({
-        id: "response-b-gpt", 
-        content: webhookResponses.resposta_gpt.trim(),
-        responseTime: 2.3,
-        cost: 0.03,
-        modelName: "GPT-4",
-        position: "B"
-      });
+    console.log("🔍 Processando respostas do webhook:", webhookResponses);
+    
+    // RESPOSTA A
+    if (webhookResponses.resposta_a) {
+      const cleanContent = webhookResponses.resposta_a
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+      
+      if (cleanContent) {
+        fixedResponses.push({
+          id: "response-a",
+          content: cleanContent,
+          responseTime: 2.1,
+          cost: 0.015,
+          modelName: "Modelo A", // Será revelado após votação
+          position: "A"
+        });
+      }
     }
     
-    // RESPOSTA C - SEMPRE CLAUDE
-    if (webhookResponses?.resposta_claude) {
-      fixedResponses.push({
-        id: "response-c-claude",
-        content: webhookResponses.resposta_claude.trim(), 
-        responseTime: 1.8,
-        cost: 0.02,
-        modelName: "Claude-3",
-        position: "C"
-      });
+    // RESPOSTA B
+    if (webhookResponses.resposta_b) {
+      const cleanContent = webhookResponses.resposta_b
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+      
+      if (cleanContent) {
+        fixedResponses.push({
+          id: "response-b",
+          content: cleanContent,
+          responseTime: 2.3,
+          cost: 0.02,
+          modelName: "Modelo B", // Será revelado após votação
+          position: "B"
+        });
+      }
+    }
+    
+    // RESPOSTA C
+    if (webhookResponses.resposta_c) {
+      const cleanContent = webhookResponses.resposta_c
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+      
+      if (cleanContent) {
+        fixedResponses.push({
+          id: "response-c",
+          content: cleanContent,
+          responseTime: 1.8,
+          cost: 0.018,
+          modelName: "Modelo C", // Será revelado após votação
+          position: "C"
+        });
+      }
     }
     
     // Debug: Log para verificar mapeamento
-    console.log("🔍 Mapeamento de Respostas:", {
-      "A (DeepSeek)": !!webhookResponses?.resposta_deepseek ? "✅" : "❌",
-      "B (GPT)": !!webhookResponses?.resposta_gpt ? "✅" : "❌", 
-      "C (Claude)": !!webhookResponses?.resposta_claude ? "✅" : "❌",
-      "Total": `${fixedResponses.length}/3`
+    console.log("🔍 Mapeamento de Respostas processadas:", {
+      "A": !!webhookResponses.resposta_a ? "✅" : "❌",
+      "B": !!webhookResponses.resposta_b ? "✅" : "❌", 
+      "C": !!webhookResponses.resposta_c ? "✅" : "❌",
+      "Total processadas": fixedResponses.length
     });
     
     return fixedResponses;
   };
 
-  // Use fixed mapping if we have webhook data, otherwise use provided responses
+  // Use processed responses if available, otherwise use provided responses
   const processedResponses = responses.length > 0 && responses[0].position 
     ? responses 
-    : parseFixedLLMResponses(responses);
+    : parseWebhookResponses(responses);
 
   const getResponseLabel = (response: BattleResponse) => {
-    // Retorna sempre a posição fixa (A, B, C)
     return response.position || 'X';
   };
 
@@ -125,13 +149,32 @@ export default function BattleVoting({
         </CardContent>
       </Card>
 
-      {/* Debug Info - Remove in production */}
+      {/* Debug Info */}
       {processedResponses.length === 0 && (
         <Card className="border-amber-500/20 bg-amber-50/10">
           <CardContent className="pt-6">
-            <p className="text-amber-600 text-sm">
-              ⚠️ Nenhuma resposta processada. Verifique se o webhook está retornando os dados corretos.
-            </p>
+            <div className="text-amber-600 text-sm space-y-2">
+              <p className="font-semibold">⚠️ Nenhuma resposta processada</p>
+              <p>Possíveis causas:</p>
+              <ul className="list-disc list-inside ml-4 space-y-1">
+                <li>Webhook retornou formato diferente do esperado</li>
+                <li>Campos resposta_a, resposta_b, resposta_c não encontrados</li>
+                <li>Erro na comunicação com o webhook</li>
+              </ul>
+              <p className="mt-2">Verifique o console do browser para mais detalhes.</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Success Info */}
+      {processedResponses.length > 0 && (
+        <Card className="border-green-500/20 bg-green-50/10">
+          <CardContent className="pt-6">
+            <div className="text-green-600 text-sm">
+              <p className="font-semibold">✅ Webhook funcionando corretamente!</p>
+              <p>Encontradas {processedResponses.length} respostas válidas para comparação.</p>
+            </div>
           </CardContent>
         </Card>
       )}
@@ -161,9 +204,9 @@ export default function BattleVoting({
             <CardContent className="space-y-4">
               {/* Response Content */}
               <div className="bg-muted/30 p-4 rounded-lg max-h-64 overflow-y-auto">
-                <pre className="whitespace-pre-wrap text-sm text-foreground font-mono">
+                <div className="whitespace-pre-wrap text-sm text-foreground">
                   {response.content}
-                </pre>
+                </div>
               </div>
 
               {/* Metrics */}
@@ -203,7 +246,7 @@ export default function BattleVoting({
       </div>
 
       {/* Reveal Button */}
-      {selectedVote && !showReveal && (
+      {selectedVote && !showReveal && processedResponses.length > 0 && (
         <div className="text-center">
           <Button
             variant="arena"
@@ -236,15 +279,15 @@ export default function BattleVoting({
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
                     <div className="font-semibold">Resposta A</div>
-                    <div className="text-muted-foreground">DeepSeek</div>
+                    <div className="text-muted-foreground">Modelo A</div>
                   </div>
                   <div className="text-center">
                     <div className="font-semibold">Resposta B</div>
-                    <div className="text-muted-foreground">GPT-4</div>
+                    <div className="text-muted-foreground">Modelo B</div>
                   </div>
                   <div className="text-center">
                     <div className="font-semibold">Resposta C</div>
-                    <div className="text-muted-foreground">Claude-3</div>
+                    <div className="text-muted-foreground">Modelo C</div>
                   </div>
                 </div>
               </div>
