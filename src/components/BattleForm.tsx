@@ -30,11 +30,10 @@ interface BattleFormProps {
     category: string;
     selectedModels: string[];
     responses?: {
-      retornos_llms: string;
       retorno_juiz: string;
-      resposta_deepseek: string;
-      resposta_gpt: string;
-      resposta_claude: string;
+      resposta_a: string;
+      resposta_b: string;
+      resposta_c: string;
     };
   }) => void;
 }
@@ -89,7 +88,6 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
         });
 
         console.log("📡 Status da resposta:", response.status, response.statusText);
-        console.log("📡 Headers da resposta:", Object.fromEntries(response.headers.entries()));
 
         if (response.ok) {
           const responseText = await response.text();
@@ -99,53 +97,55 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             const responseData = JSON.parse(responseText);
             console.log("🔍 Dados parseados do webhook:", responseData);
             console.log("🔍 Tipo de dados:", typeof responseData);
-            console.log("🔍 Keys disponíveis:", Object.keys(responseData));
+            console.log("🔍 É array?", Array.isArray(responseData));
             
-            // Verificar cada campo específico
+            // ✅ PROCESSAR FORMATO ARRAY
+            let processedData;
+            if (Array.isArray(responseData) && responseData.length > 0) {
+              // Pegar primeiro item do array
+              processedData = responseData[0];
+              console.log("✅ Processando primeiro item do array:", processedData);
+            } else {
+              // Se não for array, usar diretamente
+              processedData = responseData;
+              console.log("✅ Processando objeto direto:", processedData);
+            }
+            
+            console.log("🔍 Keys disponíveis:", Object.keys(processedData));
             console.log("🔍 Campos específicos:", {
-              retorno_juiz: responseData.retorno_juiz,
-              resposta_deepseek: responseData.resposta_deepseek,
-              resposta_gpt: responseData.resposta_gpt,
-              resposta_claude: responseData.resposta_claude,
-              retornos_llms: responseData.retornos_llms
+              retorno_juiz: processedData.retorno_juiz,
+              resposta_a: processedData.resposta_a,
+              resposta_b: processedData.resposta_b,
+              resposta_c: processedData.resposta_c
             });
 
             // Debug info para mostrar na interface
-            setDebugInfo(JSON.stringify(responseData, null, 2));
+            setDebugInfo(`✅ WEBHOOK FUNCIONANDO!\n\nFormato: ${Array.isArray(responseData) ? 'Array' : 'Objeto'}\nCampos encontrados: ${Object.keys(processedData).join(', ')}\n\n${JSON.stringify(processedData, null, 2)}`);
             
-            // Pass the webhook response to the parent component with specific variables
+            // ✅ USAR FORMATO CORRETO (resposta_a, resposta_b, resposta_c)
             onStartBattle({
               ...battleData,
               responses: {
-                retornos_llms: responseData.retornos_llms || "",
-                retorno_juiz: responseData.retorno_juiz || "",
-                resposta_deepseek: responseData.resposta_deepseek || "",
-                resposta_gpt: responseData.resposta_gpt || "",
-                resposta_claude: responseData.resposta_claude || ""
+                retorno_juiz: processedData.retorno_juiz || "",
+                resposta_a: processedData.resposta_a || "",
+                resposta_b: processedData.resposta_b || "",
+                resposta_c: processedData.resposta_c || ""
               }
             });
           } catch (parseError) {
             console.error("❌ Erro ao fazer parse da resposta:", parseError);
-            console.log("📄 Resposta que falhou no parse:", responseText);
-            setDebugInfo(`Erro no parse: ${parseError}\nResposta: ${responseText}`);
-            
-            // If parse fails, still proceed with battle but no webhook data
+            setDebugInfo(`❌ Erro no parse: ${parseError}\nResposta: ${responseText}`);
             onStartBattle(battleData);
           }
         } else {
           console.error("❌ Webhook retornou erro:", response.status, response.statusText);
           const errorText = await response.text();
-          console.error("❌ Mensagem de erro:", errorText);
-          setDebugInfo(`Erro HTTP ${response.status}: ${errorText}`);
-          
-          // If webhook fails, still proceed with battle
+          setDebugInfo(`❌ Erro HTTP ${response.status}: ${errorText}`);
           onStartBattle(battleData);
         }
       } catch (error) {
         console.error("❌ Erro na requisição do webhook:", error);
-        setDebugInfo(`Erro de rede: ${error}`);
-        
-        // If webhook fails, still proceed with battle
+        setDebugInfo(`❌ Erro de rede: ${error}`);
         onStartBattle(battleData);
       } finally {
         setIsLoading(false);
@@ -169,9 +169,23 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
       <CardContent className="space-y-6">
         {/* Debug Info */}
         {debugInfo && (
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <h4 className="font-semibold text-amber-800 mb-2">🔍 Debug - Resposta do Webhook:</h4>
-            <pre className="text-xs text-amber-700 whitespace-pre-wrap overflow-auto max-h-40">
+          <div className={`border rounded-lg p-4 ${
+            debugInfo.includes('✅ WEBHOOK FUNCIONANDO') 
+              ? 'bg-green-50 border-green-200' 
+              : 'bg-amber-50 border-amber-200'
+          }`}>
+            <h4 className={`font-semibold mb-2 ${
+              debugInfo.includes('✅ WEBHOOK FUNCIONANDO')
+                ? 'text-green-800'
+                : 'text-amber-800'
+            }`}>
+              🔍 Debug - Resposta do Webhook:
+            </h4>
+            <pre className={`text-xs whitespace-pre-wrap overflow-auto max-h-40 ${
+              debugInfo.includes('✅ WEBHOOK FUNCIONANDO')
+                ? 'text-green-700'
+                : 'text-amber-700'
+            }`}>
               {debugInfo}
             </pre>
           </div>
