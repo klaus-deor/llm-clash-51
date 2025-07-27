@@ -198,14 +198,14 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <ArenaHeader />
       
-      <div className="container-apple py-8">
+      <div className="container-minimal py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Apple-style Navigation */}
+          {/* Dark purple navigation */}
           <div className="flex justify-center mb-8">
-            <TabsList className="nav-apple">
+            <TabsList className="nav-minimal">
               <TabsTrigger 
                 value="compare" 
-                className="nav-apple-item"
+                className="nav-minimal-item"
                 data-selected={activeTab === "compare"}
               >
                 <Play className="w-4 h-4" />
@@ -213,7 +213,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="rankings"
-                className="nav-apple-item"
+                className="nav-minimal-item"
                 data-selected={activeTab === "rankings"}
               >
                 <Trophy className="w-4 h-4" />
@@ -221,7 +221,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="dashboard"
-                className="nav-apple-item"
+                className="nav-minimal-item"
                 data-selected={activeTab === "dashboard"}
               >
                 <User className="w-4 h-4" />
@@ -229,7 +229,7 @@ const Index = () => {
               </TabsTrigger>
               <TabsTrigger 
                 value="about"
-                className="nav-apple-item"
+                className="nav-minimal-item"
                 data-selected={activeTab === "about"}
               >
                 <Info className="w-4 h-4" />
@@ -238,7 +238,7 @@ const Index = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="compare" className="animate-apple-fade-in">
+          <TabsContent value="compare" className="animate-minimal-fade-in">
             {battleState === "form" && (
               <BattleForm onStartBattle={handleStartBattle} />
             )}
@@ -268,7 +268,7 @@ const Index = () => {
               <div className="text-center mt-8">
                 <button
                   onClick={handleNewBattle}
-                  className="btn-apple-primary gap-2"
+                  className="btn-minimal-primary gap-2 shadow-lg shadow-primary/25"
                 >
                   <Play className="w-4 h-4" />
                   New Comparison
@@ -277,22 +277,22 @@ const Index = () => {
             )}
           </TabsContent>
 
-          <TabsContent value="rankings" className="animate-apple-fade-in">
+          <TabsContent value="rankings" className="animate-minimal-fade-in">
             <RankingsSection 
               selectedCategory={selectedRankingCategory}
               onCategoryChange={setSelectedRankingCategory}
             />
           </TabsContent>
 
-          <TabsContent value="dashboard" className="animate-apple-fade-in">
+          <TabsContent value="dashboard" className="animate-minimal-fade-in">
             <PersonalDashboard />
           </TabsContent>
 
-          <TabsContent value="about" className="animate-apple-fade-in">
-            <div className="max-w-4xl mx-auto space-apple-lg">
+          <TabsContent value="about" className="animate-minimal-fade-in">
+            <div className="max-w-4xl mx-auto space-minimal-lg">
               {/* Hero Section */}
-              <div className="text-center space-apple-md">
-                <h1 className="text-5xl font-bold tracking-tight text-foreground mb-4">
+              <div className="text-center space-minimal-md">
+                <h1 className="text-5xl font-bold tracking-tight text-gradient-purple mb-4">
                   LLM Arena
                 </h1>
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -302,27 +302,27 @@ const Index = () => {
               
               {/* Feature Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="card-apple p-8 space-apple-sm">
-                  <h3 className="text-apple-subtitle text-primary">The Problem</h3>
-                  <p className="text-apple-body">
+                <div className="card-minimal p-8 space-minimal-sm border border-border/30">
+                  <h3 className="text-minimal-subtitle text-primary">The Problem</h3>
+                  <p className="text-minimal-body">
                     Professionals spend hours manually testing different AI models 
                     to find which generates the best response. There's no systematic 
                     way to compare outputs or understand which model works best for each task.
                   </p>
                 </div>
                 
-                <div className="card-apple p-8 space-apple-sm">
-                  <h3 className="text-apple-subtitle text-green-600">The Solution</h3>
-                  <p className="text-apple-body">
+                <div className="card-minimal p-8 space-minimal-sm border border-border/30">
+                  <h3 className="text-minimal-subtitle text-emerald-400">The Solution</h3>
+                  <p className="text-minimal-body">
                     Arena where multiple LLMs compete by generating responses to the same prompt, 
                     with blind voting determining the winner and building rankings by category. 
                     Eliminates brand bias and reveals real performance.
                   </p>
                 </div>
                 
-                <div className="card-apple p-8 space-apple-sm">
-                  <h3 className="text-apple-subtitle text-blue-600">Key Features</h3>
-                  <ul className="space-y-2 text-apple-body">
+                <div className="card-minimal p-8 space-minimal-sm border border-border/30">
+                  <h3 className="text-minimal-subtitle text-blue-400">Key Features</h3>
+                  <ul className="space-y-2 text-minimal-body">
                     <li>• Fair comparison without brand bias</li>
                     <li>• Real preference data by task type</li>
                     <li>• Cost and performance insights</li>
@@ -330,9 +330,9 @@ const Index = () => {
                   </ul>
                 </div>
                 
-                <div className="card-apple p-8 space-apple-sm">
-                  <h3 className="text-apple-subtitle text-orange-600">Impact</h3>
-                  <ul className="space-y-2 text-apple-body">
+                <div className="card-minimal p-8 space-minimal-sm border border-border/30">
+                  <h3 className="text-minimal-subtitle text-orange-400">Impact</h3>
+                  <ul className="space-y-2 text-minimal-body">
                     <li>• Cost savings with appropriate model selection</li>
                     <li>• Data-driven decisions</li>
                     <li>• Reduced testing time</li>
@@ -345,7 +345,7 @@ const Index = () => {
               <div className="text-center">
                 <button 
                   onClick={() => setActiveTab("compare")}
-                  className="btn-apple-primary px-8 py-4 text-lg gap-3"
+                  className="btn-minimal-primary px-8 py-4 text-lg gap-3 shadow-lg shadow-primary/25"
                 >
                   <Play className="w-5 h-5" />
                   Start Comparing
