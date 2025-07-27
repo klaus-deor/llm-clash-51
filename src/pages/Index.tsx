@@ -7,7 +7,7 @@ import RankingsSection from "@/components/RankingsSection";
 import PersonalDashboard from "@/components/PersonalDashboard";
 import { Zap, Trophy, User, Brain } from "lucide-react";
 
-// Mock data for battle simulation
+// Mock data for battle simulation - ONLY used as fallback
 const mockResponses = [
   {
     id: "response1",
@@ -26,7 +26,8 @@ def fibonacci_memo(n, memo={}):
     return memo[n]`,
     responseTime: 2.3,
     cost: 0.03,
-    modelName: "GPT-4 Turbo"
+    modelName: "GPT-4 Turbo",
+    position: "A"
   },
   {
     id: "response2", 
@@ -48,7 +49,8 @@ def fibonacci_sequence(limit):
         a, b = b, a + b`,
     responseTime: 1.8,
     cost: 0.02,
-    modelName: "Claude-3 Opus"
+    modelName: "Claude-3 Opus",
+    position: "B"
   },
   {
     id: "response3",
@@ -73,7 +75,8 @@ def fibonacci_sequence(limit):
 print(f"10th Fibonacci number: {fibonacci(10)}")`,
     responseTime: 3.1,
     cost: 0.01,
-    modelName: "Gemini Ultra"
+    modelName: "Gemini Ultra",
+    position: "C"
   }
 ];
 
@@ -83,10 +86,68 @@ const Index = () => {
   const [currentBattle, setCurrentBattle] = useState<any>(null);
   const [selectedRankingCategory, setSelectedRankingCategory] = useState("code");
 
+  // ✅ FUNÇÃO PARA PROCESSAR DADOS REAIS DO WEBHOOK
+  const parseWebhookResponses = (webhookResponses: any) => {
+    if (!webhookResponses) return [];
+    
+    const responses = [];
+    
+    // MAPEAMENTO FIXO: A=DeepSeek, B=GPT, C=Claude
+    if (webhookResponses.resposta_deepseek) {
+      responses.push({
+        id: "response-a-deepseek",
+        content: webhookResponses.resposta_deepseek.trim(),
+        responseTime: 2.1,
+        cost: 0.005,
+        modelName: "DeepSeek",
+        position: "A"
+      });
+    }
+    
+    if (webhookResponses.resposta_gpt) {
+      responses.push({
+        id: "response-b-gpt",
+        content: webhookResponses.resposta_gpt.trim(),
+        responseTime: 2.3,
+        cost: 0.03,
+        modelName: "GPT-4",
+        position: "B"
+      });
+    }
+    
+    if (webhookResponses.resposta_claude) {
+      responses.push({
+        id: "response-c-claude",
+        content: webhookResponses.resposta_claude.trim(),
+        responseTime: 1.8,
+        cost: 0.02,
+        modelName: "Claude-3",
+        position: "C"
+      });
+    }
+    
+    return responses;
+  };
+
   const handleStartBattle = (battleData: any) => {
+    console.log("🚀 Iniciando batalha com dados:", battleData);
+    
+    // ✅ USAR DADOS REAIS DO WEBHOOK
+    let responses = [];
+    
+    if (battleData.responses) {
+      // Processar dados reais do webhook
+      responses = parseWebhookResponses(battleData.responses);
+      console.log("✅ Usando dados reais do webhook:", responses);
+    } else {
+      // Fallback para dados mock apenas se webhook falhar
+      responses = mockResponses.slice(0, battleData.selectedModels.length);
+      console.log("⚠️ Usando dados mock (webhook falhou):", responses);
+    }
+    
     setCurrentBattle({
       ...battleData,
-      responses: mockResponses.slice(0, battleData.selectedModels.length)
+      responses
     });
     setBattleState("voting");
   };
