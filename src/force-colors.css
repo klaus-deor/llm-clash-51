@@ -1,0 +1,233 @@
+/* OVERRIDE COMPLETO - FORÇA TODAS AS CORES PARA ROXO/PRETO */
+
+/* BOTÕES - TODOS ROXO */
+button,
+.inline-flex,
+[role="button"],
+.btn,
+.Button {
+  background-color: rgb(124, 58, 237) !important;
+  color: rgb(255, 255, 255) !important;
+  border-color: rgba(124, 58, 237, 0.3) !important;
+}
+
+button:hover,
+.inline-flex:hover,
+[role="button"]:hover,
+.btn:hover,
+.Button:hover {
+  background-color: rgba(124, 58, 237, 0.9) !important;
+}
+
+/* CARDS - TODOS ROXO ESCURO */
+.card,
+.Card,
+[data-card],
+.bg-card,
+.rounded-lg,
+.rounded-xl,
+.rounded-2xl {
+  background-color: rgb(15, 15, 23) !important;
+  color: rgb(255, 255, 255) !important;
+  border-color: rgba(55, 48, 78, 0.3) !important;
+}
+
+/* INPUTS - ROXO ESCURO */
+input,
+textarea,
+select,
+.input,
+.Input {
+  background-color: rgb(30, 27, 45) !important;
+  color: rgb(255, 255, 255) !important;
+  border-color: rgba(55, 48, 78, 0.5) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: rgba(124, 58, 237, 0.5) !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.5) !important;
+}
+
+/* BADGES - ROXO */
+.badge,
+.Badge,
+[data-badge],
+.bg-primary,
+.bg-secondary {
+  background-color: rgba(124, 58, 237, 0.2) !important;
+  color: rgb(124, 58, 237) !important;
+  border-color: rgba(124, 58, 237, 0.3) !important;
+}
+
+/* TABS - ROXO ESCURO */
+[role="tablist"],
+.tabs,
+.Tabs {
+  background-color: rgba(30, 27, 45, 0.5) !important;
+}
+
+[role="tab"],
+.tab,
+.Tab {
+  color: rgb(156, 163, 175) !important;
+}
+
+[role="tab"][data-state="active"],
+[role="tab"][aria-selected="true"],
+.tab.active,
+.Tab.active {
+  background-color: rgb(124, 58, 237) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* CHECKBOXES - ROXO */
+input[type="checkbox"],
+input[type="radio"],
+.checkbox,
+.Checkbox {
+  background-color: rgb(30, 27, 45) !important;
+  border-color: rgba(124, 58, 237, 0.5) !important;
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: rgb(124, 58, 237) !important;
+  border-color: rgb(124, 58, 237) !important;
+}
+
+/* NAVIGATION - ROXO COM BLUR */
+nav,
+.nav,
+[role="navigation"],
+header {
+  background-color: rgba(15, 15, 23, 0.8) !important;
+  backdrop-filter: blur(20px) !important;
+  border-color: rgba(55, 48, 78, 0.3) !important;
+}
+
+/* TEXTO - BRANCO/CINZA */
+h1, h2, h3, h4, h5, h6 {
+  color: rgb(255, 255, 255) !important;
+}
+
+p, span, div {
+  color: rgb(255, 255, 255) !important;
+}
+
+.text-muted-foreground,
+.text-gray-500,
+.text-gray-600 {
+  color: rgb(156, 163, 175) !important;
+}
+
+/* BACKGROUNDS - PRETO/ROXO ESCURO */
+body {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+.bg-background {
+  background-color: rgb(0, 0, 0) !important;
+}
+
+.bg-muted,
+.bg-gray-50,
+.bg-gray-100 {
+  background-color: rgb(30, 27, 45) !important;
+}
+
+/* BORDAS - ROXO ESCURO */
+.border,
+.border-border,
+.border-gray-200,
+.border-gray-300 {
+  border-color: rgba(55, 48, 78, 0.3) !important;
+}
+
+/* HOVER STATES - ROXO */
+*:hover {
+  transition: all 0.2s ease !important;
+}
+
+.hover\:bg-gray-50:hover,
+.hover\:bg-gray-100:hover,
+.hover\:bg-muted:hover {
+  background-color: rgba(30, 27, 45, 0.5) !important;
+}
+
+/* FOCUS STATES - ROXO */
+*:focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.5) !important;
+}
+
+/* SELECTED STATES - ROXO */
+[data-selected="true"],
+[aria-selected="true"],
+.selected {
+  background-color: rgb(124, 58, 237) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* ACTIVE STATES - ROXO */
+[data-state="active"],
+.active {
+  background-color: rgb(124, 58, 237) !important;
+  color: rgb(255, 255, 255) !important;
+}
+
+/* SCROLLBARS - ROXO */
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgb(124, 58, 237) transparent !important;
+}
+
+*::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(124, 58, 237) !important;
+  border-radius: 3px !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(139, 69, 255) !important;
+}
+
+/* FORCE SPECIFIC TAILWIND CLASSES */
+.text-primary {
+  color: rgb(124, 58, 237) !important;
+}
+
+.bg-primary {
+  background-color: rgb(124, 58, 237) !important;
+}
+
+.border-primary {
+  border-color: rgb(124, 58, 237) !important;
+}
+
+.ring-primary {
+  --tw-ring-color: rgba(124, 58, 237, 0.5) !important;
+}
+
+/* SHADOWS - ROXO */
+.shadow,
+.shadow-sm,
+.shadow-md,
+.shadow-lg,
+.shadow-xl,
+.shadow-2xl {
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.shadow-primary {
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.25) !important;
+}
