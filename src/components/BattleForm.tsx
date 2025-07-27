@@ -4,24 +4,24 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Zap, Code, PenTool, BarChart3, Sparkles, Globe, Brain } from "lucide-react";
+import { Play, Code, PenTool, BarChart3, Sparkles, Globe, Brain, Clock, DollarSign } from "lucide-react";
 
 const categories = [
-  { id: "code", label: "Código", icon: Code },
-  { id: "writing", label: "Escrita", icon: PenTool },
-  { id: "analysis", label: "Análise", icon: BarChart3 },
-  { id: "creative", label: "Criativo", icon: Sparkles },
-  { id: "translation", label: "Tradução", icon: Globe },
-  { id: "other", label: "Outro", icon: Brain },
+  { id: "code", label: "Code", icon: Code, color: "bg-blue-500" },
+  { id: "writing", label: "Writing", icon: PenTool, color: "bg-purple-500" },
+  { id: "analysis", label: "Analysis", icon: BarChart3, color: "bg-green-500" },
+  { id: "creative", label: "Creative", icon: Sparkles, color: "bg-pink-500" },
+  { id: "translation", label: "Translation", icon: Globe, color: "bg-orange-500" },
+  { id: "other", label: "Other", icon: Brain, color: "bg-gray-500" },
 ];
 
 const models = [
-  { id: "gpt4", name: "GPT-4", color: "bg-green-500", cost: "$0.03" },
-  { id: "claude", name: "Claude-3", color: "bg-orange-500", cost: "$0.02" },
-  { id: "gemini", name: "Gemini", color: "bg-blue-500", cost: "$0.01" },
-  { id: "llama", name: "Llama-3", color: "bg-purple-500", cost: "$0.005" },
-  { id: "mistral", name: "Mistral", color: "bg-red-500", cost: "$0.004" },
-  { id: "cohere", name: "Cohere", color: "bg-yellow-500", cost: "$0.006" },
+  { id: "gpt4", name: "GPT-4", color: "bg-emerald-500", cost: 0.03 },
+  { id: "claude", name: "Claude", color: "bg-orange-500", cost: 0.02 },
+  { id: "gemini", name: "Gemini", color: "bg-blue-500", cost: 0.01 },
+  { id: "llama", name: "Llama", color: "bg-purple-500", cost: 0.005 },
+  { id: "mistral", name: "Mistral", color: "bg-red-500", cost: 0.004 },
+  { id: "cohere", name: "Cohere", color: "bg-yellow-500", cost: 0.006 },
 ];
 
 interface BattleFormProps {
@@ -102,11 +102,9 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             // ✅ PROCESSAR FORMATO ARRAY
             let processedData;
             if (Array.isArray(responseData) && responseData.length > 0) {
-              // Pegar primeiro item do array
               processedData = responseData[0];
               console.log("✅ Processando primeiro item do array:", processedData);
             } else {
-              // Se não for array, usar diretamente
               processedData = responseData;
               console.log("✅ Processando objeto direto:", processedData);
             }
@@ -119,10 +117,8 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
               resposta_c: processedData.resposta_c
             });
 
-            // Debug info para mostrar na interface
-            setDebugInfo(`✅ WEBHOOK FUNCIONANDO!\n\nFormato: ${Array.isArray(responseData) ? 'Array' : 'Objeto'}\nCampos encontrados: ${Object.keys(processedData).join(', ')}\n\n${JSON.stringify(processedData, null, 2)}`);
+            setDebugInfo(`✅ Connection successful!\n\nFormat: ${Array.isArray(responseData) ? 'Array' : 'Object'}\nFields: ${Object.keys(processedData).join(', ')}`);
             
-            // ✅ USAR FORMATO CORRETO (resposta_a, resposta_b, resposta_c)
             onStartBattle({
               ...battleData,
               responses: {
@@ -134,18 +130,18 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             });
           } catch (parseError) {
             console.error("❌ Erro ao fazer parse da resposta:", parseError);
-            setDebugInfo(`❌ Erro no parse: ${parseError}\nResposta: ${responseText}`);
+            setDebugInfo(`Parse error: ${parseError}`);
             onStartBattle(battleData);
           }
         } else {
           console.error("❌ Webhook retornou erro:", response.status, response.statusText);
           const errorText = await response.text();
-          setDebugInfo(`❌ Erro HTTP ${response.status}: ${errorText}`);
+          setDebugInfo(`HTTP ${response.status}: ${errorText}`);
           onStartBattle(battleData);
         }
       } catch (error) {
         console.error("❌ Erro na requisição do webhook:", error);
-        setDebugInfo(`❌ Erro de rede: ${error}`);
+        setDebugInfo(`Network error: ${error}`);
         onStartBattle(battleData);
       } finally {
         setIsLoading(false);
@@ -155,138 +151,141 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
 
   const totalCost = selectedModels.reduce((sum, modelId) => {
     const model = models.find(m => m.id === modelId);
-    return sum + parseFloat(model?.cost.replace('$', '') || '0');
+    return sum + (model?.cost || 0);
   }, 0);
 
   return (
-    <Card className="w-full max-w-4xl mx-auto bg-gradient-battle border-primary/20">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-2xl">
-          <Zap className="w-6 h-6 text-primary" />
-          Novo Desafio na Arena
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Debug Info */}
-        {debugInfo && (
-          <div className={`border rounded-lg p-4 ${
-            debugInfo.includes('✅ WEBHOOK FUNCIONANDO') 
-              ? 'bg-green-50 border-green-200' 
-              : 'bg-amber-50 border-amber-200'
-          }`}>
-            <h4 className={`font-semibold mb-2 ${
-              debugInfo.includes('✅ WEBHOOK FUNCIONANDO')
-                ? 'text-green-800'
-                : 'text-amber-800'
-            }`}>
-              🔍 Debug - Resposta do Webhook:
-            </h4>
-            <pre className={`text-xs whitespace-pre-wrap overflow-auto max-h-40 ${
-              debugInfo.includes('✅ WEBHOOK FUNCIONANDO')
-                ? 'text-green-700'
-                : 'text-amber-700'
-            }`}>
-              {debugInfo}
-            </pre>
-          </div>
-        )}
+    <div className="space-apple-lg">
+      {/* Header */}
+      <div className="text-center space-apple-md">
+        <h1 className="text-apple-title">New Comparison</h1>
+        <p className="text-apple-body max-w-2xl mx-auto">
+          Compare responses from different AI models and vote for the best one
+        </p>
+      </div>
 
-        {/* Prompt Input */}
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Seu prompt:</label>
-          <Textarea
-            placeholder="Digite seu prompt aqui... Ex: Crie uma função Python para calcular fibonacci"
-            value={prompt}
-            onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[120px] resize-none bg-muted/50 border-primary/20 focus:border-primary"
-          />
-          <div className="text-xs text-muted-foreground">
-            {prompt.length}/1000 caracteres
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Categoria:</label>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            {categories.map((category) => {
-              const IconComponent = category.icon;
-              return (
-                <Button
-                  key={category.id}
-                  variant={selectedCategory === category.id ? "default" : "arena"}
-                  onClick={() => setSelectedCategory(category.id)}
-                  className="justify-start gap-2 h-12"
-                >
-                  <IconComponent className="w-4 h-4" />
-                  {category.label}
-                </Button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Model Selection */}
-        <div className="space-y-3">
-          <label className="text-sm font-medium">Modelos para competir:</label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {models.map((model) => (
-              <div
-                key={model.id}
-                className="flex items-center gap-3 p-3 rounded-lg border border-border hover:border-primary/40 transition-colors cursor-pointer"
-                onClick={() => handleModelToggle(model.id)}
-              >
-                <Checkbox
-                  checked={selectedModels.includes(model.id)}
-                  onChange={() => handleModelToggle(model.id)}
-                />
-                <div className={`w-3 h-3 rounded-full ${model.color}`} />
-                <span className="font-medium flex-1">{model.name}</span>
-                <Badge variant="outline" className="text-xs">
-                  {model.cost}
-                </Badge>
+      <div className="max-w-4xl mx-auto">
+        <Card className="card-apple">
+          <CardContent className="p-8 space-apple-lg">
+            {/* Debug Info */}
+            {debugInfo && (
+              <div className={`rounded-xl p-4 text-sm ${
+                debugInfo.includes('✅ Connection successful') 
+                  ? 'status-success' 
+                  : 'status-warning'
+              }`}>
+                <div className="font-medium mb-2">Connection Status</div>
+                <pre className="text-xs opacity-75">{debugInfo}</pre>
               </div>
-            ))}
-          </div>
-        </div>
+            )}
 
-        {/* Battle Summary */}
-        <div className="bg-muted/30 rounded-lg p-4 space-y-2">
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Modelos selecionados:</span>
-            <Badge variant="outline">{selectedModels.length}</Badge>
-          </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm font-medium">Custo total estimado:</span>
-            <Badge className="bg-accent text-accent-foreground">
-              ${totalCost.toFixed(3)}
-            </Badge>
-          </div>
-        </div>
+            {/* Prompt Input */}
+            <div className="space-apple-sm">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Your prompt
+              </label>
+              <Textarea
+                placeholder="Enter your prompt here... e.g., Write a Python function to calculate fibonacci numbers"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="input-apple min-h-[120px] resize-none"
+              />
+              <div className="text-apple-caption mt-2">
+                {prompt.length}/1000 characters
+              </div>
+            </div>
 
-        {/* Start Battle Button */}
-        <Button
-          variant="battle"
-          size="lg"
-          onClick={handleStartBattle}
-          disabled={!prompt.trim() || selectedModels.length < 2 || isLoading}
-          className="w-full text-lg h-14"
-        >
-          <Zap className="w-5 h-5" />
-          {isLoading ? "Processando..." : "Iniciar Batalha"}
-          {selectedModels.length >= 2 && !isLoading && (
-            <Badge className="ml-2 bg-primary-foreground text-primary">
-              {selectedModels.length} vs {selectedModels.length}
-            </Badge>
-          )}
-        </Button>
-        
-        {selectedModels.length < 2 && (
-          <p className="text-sm text-muted-foreground text-center">
-            Selecione pelo menos 2 modelos para iniciar a batalha
-          </p>
-        )}
-      </CardContent>
-    </Card>
+            {/* Categories */}
+            <div className="space-apple-sm">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Category
+              </label>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {categories.map((category) => {
+                  const IconComponent = category.icon;
+                  return (
+                    <button
+                      key={category.id}
+                      onClick={() => setSelectedCategory(category.id)}
+                      className={`btn-apple p-4 justify-start gap-3 transition-all ${
+                        selectedCategory === category.id 
+                          ? 'btn-apple-primary' 
+                          : 'btn-apple-secondary'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg ${category.color} bg-opacity-10`}>
+                        <IconComponent className={`w-4 h-4 ${category.color.replace('bg-', 'text-')}`} />
+                      </div>
+                      <span className="font-medium">{category.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Model Selection */}
+            <div className="space-apple-sm">
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Select models to compare
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {models.map((model) => (
+                  <div
+                    key={model.id}
+                    onClick={() => handleModelToggle(model.id)}
+                    className={`card-apple p-4 cursor-pointer transition-all ${
+                      selectedModels.includes(model.id)
+                        ? 'ring-2 ring-primary bg-primary/5'
+                        : 'hover:bg-secondary/50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Checkbox checked={selectedModels.includes(model.id)} />
+                      <div className={`w-3 h-3 rounded-full ${model.color}`} />
+                      <span className="font-medium flex-1">{model.name}</span>
+                      <div className="flex items-center gap-1 text-muted-foreground text-sm">
+                        <DollarSign className="w-3 h-3" />
+                        <span>{model.cost.toFixed(3)}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="card-apple p-4 bg-secondary/30">
+              <div className="flex justify-between items-center text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Models selected:</span>
+                  <Badge variant="outline">{selectedModels.length}</Badge>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">Est. cost:</span>
+                  <span className="font-mono">${totalCost.toFixed(3)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Start Button */}
+            <button
+              onClick={handleStartBattle}
+              disabled={!prompt.trim() || selectedModels.length < 2 || isLoading}
+              className="btn-apple-primary w-full h-14 text-base font-medium gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Play className="w-5 h-5" />
+              {isLoading ? "Starting comparison..." : "Start Comparison"}
+            </button>
+            
+            {selectedModels.length < 2 && (
+              <p className="text-apple-caption text-center">
+                Select at least 2 models to start the comparison
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }
