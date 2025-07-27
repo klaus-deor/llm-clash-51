@@ -31,7 +31,7 @@ interface BattleFormProps {
     selectedModels: string[];
     responses?: {
       retornos_llms: string;
-      retorno_juiz: string; // ✅ CORRIGIDO: era "retono_juiz"
+      retorno_juiz: string;
       resposta_deepseek: string;
       resposta_gpt: string;
       resposta_claude: string;
@@ -44,6 +44,7 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
   const [selectedCategory, setSelectedCategory] = useState("code");
   const [selectedModels, setSelectedModels] = useState(["gpt4", "claude", "gemini"]);
   const [isLoading, setIsLoading] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   const handleModelToggle = (modelId: string) => {
     setSelectedModels(prev => 
@@ -56,6 +57,7 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
   const handleStartBattle = async () => {
     if (prompt.trim() && selectedModels.length >= 2 && !isLoading) {
       setIsLoading(true);
+      setDebugInfo(null);
       
       const battleData = {
         prompt: prompt.trim(),
@@ -65,6 +67,15 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
 
       // Send to webhook
       try {
+        console.log("🚀 Enviando para webhook:", {
+          url: "https://kaua1nagel.app.n8n.cloud/webhook/teste",
+          payload: {
+            ...battleData,
+            timestamp: new Date().toISOString(),
+            totalCost: totalCost.toFixed(3),
+          }
+        });
+
         const response = await fetch("https://kaua1nagel.app.n8n.cloud/webhook/teste", {
           method: "POST",
           headers: {
@@ -77,29 +88,63 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
           }),
         });
 
+        console.log("📡 Status da resposta:", response.status, response.statusText);
+        console.log("📡 Headers da resposta:", Object.fromEntries(response.headers.entries()));
+
         if (response.ok) {
-          const responseData = await response.json();
+          const responseText = await response.text();
+          console.log("📥 Resposta RAW do webhook:", responseText);
           
-          // Debug: Log para verificar estrutura dos dados recebidos
-          console.log("🔍 Dados recebidos do webhook:", responseData);
-          
-          // Pass the webhook response to the parent component with specific variables
-          onStartBattle({
-            ...battleData,
-            responses: {
-              retornos_llms: responseData.retornos_llms || "",
-              retorno_juiz: responseData.retorno_juiz || "", // ✅ CORRIGIDO: era "retono_juiz"
-              resposta_deepseek: responseData.resposta_deepseek || "",
-              resposta_gpt: responseData.resposta_gpt || "",
-              resposta_claude: responseData.resposta_claude || ""
-            }
-          });
+          try {
+            const responseData = JSON.parse(responseText);
+            console.log("🔍 Dados parseados do webhook:", responseData);
+            console.log("🔍 Tipo de dados:", typeof responseData);
+            console.log("🔍 Keys disponíveis:", Object.keys(responseData));
+            
+            // Verificar cada campo específico
+            console.log("🔍 Campos específicos:", {
+              retorno_juiz: responseData.retorno_juiz,
+              resposta_deepseek: responseData.resposta_deepseek,
+              resposta_gpt: responseData.resposta_gpt,
+              resposta_claude: responseData.resposta_claude,
+              retornos_llms: responseData.retornos_llms
+            });
+
+            // Debug info para mostrar na interface
+            setDebugInfo(JSON.stringify(responseData, null, 2));
+            
+            // Pass the webhook response to the parent component with specific variables
+            onStartBattle({
+              ...battleData,
+              responses: {
+                retornos_llms: responseData.retornos_llms || "",
+                retorno_juiz: responseData.retorno_juiz || "",
+                resposta_deepseek: responseData.resposta_deepseek || "",
+                resposta_gpt: responseData.resposta_gpt || "",
+                resposta_claude: responseData.resposta_claude || ""
+              }
+            });
+          } catch (parseError) {
+            console.error("❌ Erro ao fazer parse da resposta:", parseError);
+            console.log("📄 Resposta que falhou no parse:", responseText);
+            setDebugInfo(`Erro no parse: ${parseError}\nResposta: ${responseText}`);
+            
+            // If parse fails, still proceed with battle but no webhook data
+            onStartBattle(battleData);
+          }
         } else {
+          console.error("❌ Webhook retornou erro:", response.status, response.statusText);
+          const errorText = await response.text();
+          console.error("❌ Mensagem de erro:", errorText);
+          setDebugInfo(`Erro HTTP ${response.status}: ${errorText}`);
+          
           // If webhook fails, still proceed with battle
           onStartBattle(battleData);
         }
       } catch (error) {
-        console.error("Error sending to webhook:", error);
+        console.error("❌ Erro na requisição do webhook:", error);
+        setDebugInfo(`Erro de rede: ${error}`);
+        
         // If webhook fails, still proceed with battle
         onStartBattle(battleData);
       } finally {
@@ -122,6 +167,16 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Debug Info */}
+        {debugInfo && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <h4 className="font-semibold text-amber-800 mb-2">🔍 Debug - Resposta do Webhook:</h4>
+            <pre className="text-xs text-amber-700 whitespace-pre-wrap overflow-auto max-h-40">
+              {debugInfo}
+            </pre>
+          </div>
+        )}
+
         {/* Prompt Input */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Seu prompt:</label>
