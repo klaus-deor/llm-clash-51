@@ -5,7 +5,7 @@ import BattleForm from "@/components/BattleForm";
 import BattleVoting from "@/components/BattleVoting";
 import RankingsSection from "@/components/RankingsSection";
 import PersonalDashboard from "@/components/PersonalDashboard";
-import { Zap, Trophy, User, Brain } from "lucide-react";
+import { Play, Trophy, User, Info } from "lucide-react";
 
 // Mock data for battle simulation - ONLY used as fallback
 const mockResponses = [
@@ -26,7 +26,7 @@ def fibonacci_memo(n, memo={}):
     return memo[n]`,
     responseTime: 2.3,
     cost: 0.03,
-    modelName: "Modelo A",
+    modelName: "Model A",
     position: "A"
   },
   {
@@ -49,7 +49,7 @@ def fibonacci_sequence(limit):
         a, b = b, a + b`,
     responseTime: 1.8,
     cost: 0.02,
-    modelName: "Modelo B",
+    modelName: "Model B",
     position: "B"
   },
   {
@@ -75,32 +75,31 @@ def fibonacci_sequence(limit):
 print(f"10th Fibonacci number: {fibonacci(10)}")`,
     responseTime: 3.1,
     cost: 0.01,
-    modelName: "Modelo C",
+    modelName: "Model C",
     position: "C"
   }
 ];
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState("battle");
+  const [activeTab, setActiveTab] = useState("compare");
   const [battleState, setBattleState] = useState<"form" | "voting" | "completed">("form");
   const [currentBattle, setCurrentBattle] = useState<any>(null);
   const [selectedRankingCategory, setSelectedRankingCategory] = useState("code");
 
-  // ✅ FUNÇÃO PARA PROCESSAR DADOS REAIS DO WEBHOOK (formato correto)
   const parseWebhookResponses = (webhookResponses: any) => {
     if (!webhookResponses) {
-      console.log("⚠️ Nenhuma resposta do webhook para processar");
+      console.log("⚠️ No webhook responses to process");
       return [];
     }
     
-    console.log("🔍 Processando respostas do webhook no Index:", webhookResponses);
+    console.log("🔍 Processing webhook responses in Index:", webhookResponses);
     
     const responses = [];
     
-    // MAPEAMENTO CORRETO: A, B, C baseado no formato do webhook
+    // Process A, B, C responses
     if (webhookResponses.resposta_a) {
       const cleanContent = webhookResponses.resposta_a
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
         
       if (cleanContent) {
@@ -109,7 +108,7 @@ const Index = () => {
           content: cleanContent,
           responseTime: 2.1,
           cost: 0.015,
-          modelName: "Modelo A",
+          modelName: "Model A",
           position: "A"
         });
       }
@@ -117,7 +116,7 @@ const Index = () => {
     
     if (webhookResponses.resposta_b) {
       const cleanContent = webhookResponses.resposta_b
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
         
       if (cleanContent) {
@@ -126,7 +125,7 @@ const Index = () => {
           content: cleanContent,
           responseTime: 2.3,
           cost: 0.02,
-          modelName: "Modelo B",
+          modelName: "Model B",
           position: "B"
         });
       }
@@ -134,7 +133,7 @@ const Index = () => {
     
     if (webhookResponses.resposta_c) {
       const cleanContent = webhookResponses.resposta_c
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
         
       if (cleanContent) {
@@ -143,13 +142,13 @@ const Index = () => {
           content: cleanContent,
           responseTime: 1.8,
           cost: 0.018,
-          modelName: "Modelo C",
+          modelName: "Model C",
           position: "C"
         });
       }
     }
     
-    console.log("✅ Respostas processadas no Index:", {
+    console.log("✅ Responses processed in Index:", {
       total: responses.length,
       positions: responses.map(r => r.position)
     });
@@ -158,25 +157,21 @@ const Index = () => {
   };
 
   const handleStartBattle = (battleData: any) => {
-    console.log("🚀 Iniciando batalha com dados:", battleData);
+    console.log("🚀 Starting comparison with data:", battleData);
     
-    // ✅ USAR DADOS REAIS DO WEBHOOK
     let responses = [];
     
     if (battleData.responses) {
-      // Processar dados reais do webhook
       responses = parseWebhookResponses(battleData.responses);
-      console.log("✅ Usando dados reais do webhook:", responses);
+      console.log("✅ Using real webhook data:", responses);
       
-      // Se não conseguiu processar nenhuma resposta, usar fallback
       if (responses.length === 0) {
-        console.log("⚠️ Nenhuma resposta válida processada, usando fallback mock");
-        responses = mockResponses.slice(0, 3); // Sempre 3 respostas A, B, C
+        console.log("⚠️ No valid responses processed, using fallback mock");
+        responses = mockResponses.slice(0, 3);
       }
     } else {
-      // Fallback para dados mock apenas se webhook falhar completamente
-      responses = mockResponses.slice(0, 3); // Sempre 3 respostas A, B, C
-      console.log("⚠️ Usando dados mock (webhook falhou):", responses);
+      responses = mockResponses.slice(0, 3);
+      console.log("⚠️ Using mock data (webhook failed):", responses);
     }
     
     setCurrentBattle({
@@ -187,10 +182,7 @@ const Index = () => {
   };
 
   const handleVote = (responseId: string) => {
-    console.log("🗳️ Voto registrado para:", responseId);
-    
-    // Aqui você pode implementar lógica para salvar o voto
-    // Por exemplo, enviar para um backend ou analytics
+    console.log("🗳️ Vote registered for:", responseId);
   };
 
   const handleReveal = () => {
@@ -206,40 +198,47 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <ArenaHeader />
       
-      <div className="container mx-auto px-4 py-12">
+      <div className="container-apple py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-4 max-w-md mx-auto mb-8 bg-muted/30 p-1">
-            <TabsTrigger 
-              value="battle" 
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <Zap className="w-4 h-4" />
-              <span className="hidden sm:inline">Batalha</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="rankings"
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <Trophy className="w-4 h-4" />
-              <span className="hidden sm:inline">Rankings</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="dashboard"
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <User className="w-4 h-4" />
-              <span className="hidden sm:inline">Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="about"
-              className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
-            >
-              <Brain className="w-4 h-4" />
-              <span className="hidden sm:inline">Sobre</span>
-            </TabsTrigger>
-          </TabsList>
+          {/* Apple-style Navigation */}
+          <div className="flex justify-center mb-8">
+            <TabsList className="nav-apple">
+              <TabsTrigger 
+                value="compare" 
+                className="nav-apple-item"
+                data-selected={activeTab === "compare"}
+              >
+                <Play className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">Compare</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="rankings"
+                className="nav-apple-item"
+                data-selected={activeTab === "rankings"}
+              >
+                <Trophy className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">Rankings</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="dashboard"
+                className="nav-apple-item"
+                data-selected={activeTab === "dashboard"}
+              >
+                <User className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">Dashboard</span>
+              </TabsTrigger>
+              <TabsTrigger 
+                value="about"
+                className="nav-apple-item"
+                data-selected={activeTab === "about"}
+              >
+                <Info className="w-4 h-4" />
+                <span className="hidden sm:inline ml-2">About</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="battle" className="space-y-8">
+          <TabsContent value="compare" className="animate-apple-fade-in">
             {battleState === "form" && (
               <BattleForm onStartBattle={handleStartBattle} />
             )}
@@ -265,74 +264,92 @@ const Index = () => {
               />
             )}
             
-            {/* Botão para nova batalha quando completada */}
             {battleState === "completed" && (
-              <div className="text-center">
+              <div className="text-center mt-8">
                 <button
                   onClick={handleNewBattle}
-                  className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  className="btn-apple-primary gap-2"
                 >
-                  🔄 Nova Batalha
+                  <Play className="w-4 h-4" />
+                  New Comparison
                 </button>
               </div>
             )}
           </TabsContent>
 
-          <TabsContent value="rankings">
+          <TabsContent value="rankings" className="animate-apple-fade-in">
             <RankingsSection 
               selectedCategory={selectedRankingCategory}
               onCategoryChange={setSelectedRankingCategory}
             />
           </TabsContent>
 
-          <TabsContent value="dashboard">
+          <TabsContent value="dashboard" className="animate-apple-fade-in">
             <PersonalDashboard />
           </TabsContent>
 
-          <TabsContent value="about" className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center space-y-4">
-              <h2 className="text-4xl font-bold bg-gradient-arena bg-clip-text text-transparent">
-                🧠 Sobre o PromptArena AI
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4 p-6 rounded-lg bg-gradient-battle border border-primary/20">
-                <h3 className="text-xl font-bold text-primary">O Problema</h3>
-                <p className="text-muted-foreground">
-                  Profissionais perdem horas testando manualmente diferentes modelos de IA (GPT-4, Claude, Gemini) 
-                  para encontrar qual gera melhor resposta. Não há forma sistemática de comparar outputs ou 
-                  entender qual modelo funciona melhor para cada tipo de tarefa.
+          <TabsContent value="about" className="animate-apple-fade-in">
+            <div className="max-w-4xl mx-auto space-apple-lg">
+              {/* Hero Section */}
+              <div className="text-center space-apple-md">
+                <h1 className="text-5xl font-bold tracking-tight text-foreground mb-4">
+                  LLM Arena
+                </h1>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Compare AI models through blind testing and community voting
                 </p>
               </div>
               
-              <div className="space-y-4 p-6 rounded-lg bg-gradient-battle border border-primary/20">
-                <h3 className="text-xl font-bold text-secondary">A Solução</h3>
-                <p className="text-muted-foreground">
-                  Arena onde múltiplos LLMs competem gerando respostas para o mesmo prompt, 
-                  com votação cega determinando vencedor e construindo ranking por categoria de uso. 
-                  Elimina viés de marca e revela real performance dos modelos.
-                </p>
+              {/* Feature Cards */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="card-apple p-8 space-apple-sm">
+                  <h3 className="text-apple-subtitle text-primary">The Problem</h3>
+                  <p className="text-apple-body">
+                    Professionals spend hours manually testing different AI models 
+                    to find which generates the best response. There's no systematic 
+                    way to compare outputs or understand which model works best for each task.
+                  </p>
+                </div>
+                
+                <div className="card-apple p-8 space-apple-sm">
+                  <h3 className="text-apple-subtitle text-green-600">The Solution</h3>
+                  <p className="text-apple-body">
+                    Arena where multiple LLMs compete by generating responses to the same prompt, 
+                    with blind voting determining the winner and building rankings by category. 
+                    Eliminates brand bias and reveals real performance.
+                  </p>
+                </div>
+                
+                <div className="card-apple p-8 space-apple-sm">
+                  <h3 className="text-apple-subtitle text-blue-600">Key Features</h3>
+                  <ul className="space-y-2 text-apple-body">
+                    <li>• Fair comparison without brand bias</li>
+                    <li>• Real preference data by task type</li>
+                    <li>• Cost and performance insights</li>
+                    <li>• Dynamic community rankings</li>
+                  </ul>
+                </div>
+                
+                <div className="card-apple p-8 space-apple-sm">
+                  <h3 className="text-apple-subtitle text-orange-600">Impact</h3>
+                  <ul className="space-y-2 text-apple-body">
+                    <li>• Cost savings with appropriate model selection</li>
+                    <li>• Data-driven decisions</li>
+                    <li>• Reduced testing time</li>
+                    <li>• Better AI results</li>
+                  </ul>
+                </div>
               </div>
               
-              <div className="space-y-4 p-6 rounded-lg bg-gradient-battle border border-primary/20">
-                <h3 className="text-xl font-bold text-accent">Diferenciais</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Comparação justa sem viés de marca</li>
-                  <li>• Dados reais de preferência por tarefa</li>
-                  <li>• Insights de custo e performance</li>
-                  <li>• Rankings dinâmicos da comunidade</li>
-                </ul>
-              </div>
-              
-              <div className="space-y-4 p-6 rounded-lg bg-gradient-battle border border-primary/20">
-                <h3 className="text-xl font-bold text-arena-gold">Impacto</h3>
-                <ul className="space-y-2 text-muted-foreground">
-                  <li>• Economia de custos com modelo adequado</li>
-                  <li>• Decisões baseadas em dados reais</li>
-                  <li>• Redução de tempo de testes</li>
-                  <li>• Melhores resultados de IA</li>
-                </ul>
+              {/* CTA */}
+              <div className="text-center">
+                <button 
+                  onClick={() => setActiveTab("compare")}
+                  className="btn-apple-primary px-8 py-4 text-lg gap-3"
+                >
+                  <Play className="w-5 h-5" />
+                  Start Comparing
+                </button>
               </div>
             </div>
           </TabsContent>
