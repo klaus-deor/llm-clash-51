@@ -10,6 +10,7 @@ interface BattleResponse {
   responseTime: number;
   cost: number;
   modelName?: string; // Hidden until voting is complete
+  position: string; // A, B, C
 }
 
 interface BattleVotingProps {
@@ -42,43 +43,65 @@ export default function BattleVoting({
     onReveal();
   };
 
-  const getResponseLabel = (index: number) => {
-    const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
-    return labels[index] || `${index + 1}`;
-  };
-
-  // Parse LLM responses and shuffle labels
-  const parseAndShuffleLLMResponses = (retornos_llms: string) => {
-    const responses = [];
-    const models = ['deepseek', 'gpt', 'claude', 'llama', 'mistral', 'cohere'];
+  // ✅ MAPEAMENTO FIXO: A=DeepSeek, B=GPT, C=Claude
+  const parseFixedLLMResponses = (webhookResponses: any) => {
+    const fixedResponses: BattleResponse[] = [];
     
-    // Split by model names to extract individual responses
-    const parts = retornos_llms.split(/(?=\b(?:deepseek|gpt|claude|llama|mistral|cohere)\b)/);
-    
-    for (const part of parts) {
-      if (part.trim()) {
-        const modelMatch = part.match(/^(\w+)\s+([\s\S]+)/);
-        if (modelMatch) {
-          const [, modelName, content] = modelMatch;
-          const cleanContent = content
-            .replace(/<think>[\s\S]*?<\/think>/g, '')
-            .trim();
-          
-          if (cleanContent) {
-            responses.push({
-              id: `${modelName}-${Math.random()}`,
-              content: cleanContent,
-              responseTime: Math.random() * 3 + 1, // Random time between 1-4s
-              cost: Math.random() * 0.05 + 0.01, // Random cost
-              modelName: modelName
-            });
-          }
-        }
-      }
+    // RESPOSTA A - SEMPRE DEEPSEEK
+    if (webhookResponses?.resposta_deepseek) {
+      fixedResponses.push({
+        id: "response-a-deepseek",
+        content: webhookResponses.resposta_deepseek.trim(),
+        responseTime: 2.1,
+        cost: 0.005,
+        modelName: "DeepSeek",
+        position: "A"
+      });
     }
     
-    // Shuffle responses to randomize A, B, C assignment
-    return responses.sort(() => Math.random() - 0.5);
+    // RESPOSTA B - SEMPRE GPT
+    if (webhookResponses?.resposta_gpt) {
+      fixedResponses.push({
+        id: "response-b-gpt", 
+        content: webhookResponses.resposta_gpt.trim(),
+        responseTime: 2.3,
+        cost: 0.03,
+        modelName: "GPT-4",
+        position: "B"
+      });
+    }
+    
+    // RESPOSTA C - SEMPRE CLAUDE
+    if (webhookResponses?.resposta_claude) {
+      fixedResponses.push({
+        id: "response-c-claude",
+        content: webhookResponses.resposta_claude.trim(), 
+        responseTime: 1.8,
+        cost: 0.02,
+        modelName: "Claude-3",
+        position: "C"
+      });
+    }
+    
+    // Debug: Log para verificar mapeamento
+    console.log("🔍 Mapeamento de Respostas:", {
+      "A (DeepSeek)": !!webhookResponses?.resposta_deepseek ? "✅" : "❌",
+      "B (GPT)": !!webhookResponses?.resposta_gpt ? "✅" : "❌", 
+      "C (Claude)": !!webhookResponses?.resposta_claude ? "✅" : "❌",
+      "Total": `${fixedResponses.length}/3`
+    });
+    
+    return fixedResponses;
+  };
+
+  // Use fixed mapping if we have webhook data, otherwise use provided responses
+  const processedResponses = responses.length > 0 && responses[0].position 
+    ? responses 
+    : parseFixedLLMResponses(responses);
+
+  const getResponseLabel = (response: BattleResponse) => {
+    // Retorna sempre a posição fixa (A, B, C)
+    return response.position || 'X';
   };
 
   return (
@@ -102,9 +125,20 @@ export default function BattleVoting({
         </CardContent>
       </Card>
 
+      {/* Debug Info - Remove in production */}
+      {processedResponses.length === 0 && (
+        <Card className="border-amber-500/20 bg-amber-50/10">
+          <CardContent className="pt-6">
+            <p className="text-amber-600 text-sm">
+              ⚠️ Nenhuma resposta processada. Verifique se o webhook está retornando os dados corretos.
+            </p>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Responses Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {responses.map((response, index) => (
+        {processedResponses.map((response) => (
           <Card
             key={response.id}
             className={`relative transition-all duration-300 hover:shadow-battle ${
@@ -115,7 +149,7 @@ export default function BattleVoting({
           >
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center justify-between">
-                <span className="text-lg">Resposta {getResponseLabel(index)}</span>
+                <span className="text-lg">Resposta {getResponseLabel(response)}</span>
                 {showReveal && response.modelName && (
                   <Badge className="bg-primary text-primary-foreground">
                     {response.modelName}
@@ -195,6 +229,26 @@ export default function BattleVoting({
                 Obrigado por contribuir para melhorar nossos rankings! 
                 Seus dados ajudam outros usuários a escolher o melhor modelo.
               </p>
+              
+              {/* Results Summary */}
+              <div className="bg-muted/30 rounded-lg p-4 mt-4">
+                <h4 className="font-semibold mb-2">📊 Resumo da Batalha:</h4>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                  <div className="text-center">
+                    <div className="font-semibold">Resposta A</div>
+                    <div className="text-muted-foreground">DeepSeek</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold">Resposta B</div>
+                    <div className="text-muted-foreground">GPT-4</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-semibold">Resposta C</div>
+                    <div className="text-muted-foreground">Claude-3</div>
+                  </div>
+                </div>
+              </div>
+              
               <div className="flex flex-wrap justify-center gap-4 mt-6">
                 <Button variant="battle">
                   <Sparkles className="w-4 h-4" />
