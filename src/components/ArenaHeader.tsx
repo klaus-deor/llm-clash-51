@@ -3,15 +3,15 @@ import { Brain, Sparkles } from "lucide-react";
 export default function ArenaHeader() {
   return (
     <header className="sticky top-0 z-50 w-full">
-      {/* Apple-style blur background */}
-      <div className="glass-apple border-b border-border/50">
-        <div className="container-apple">
+      {/* Dark purple blur background */}
+      <div className="glass-minimal border-b border-border/30">
+        <div className="container-minimal">
           <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
+            {/* Logo with purple accent */}
             <div className="flex items-center gap-3">
               <div className="relative">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-                  <Brain className="h-6 w-6 text-primary-foreground" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl gradient-purple">
+                  <Brain className="h-6 w-6 text-white" />
                 </div>
                 <div className="absolute -top-1 -right-1">
                   <Sparkles className="h-4 w-4 text-primary" />
@@ -27,11 +27,10 @@ export default function ArenaHeader() {
               </div>
             </div>
 
-            {/* Right side - minimal */}
+            {/* Right side - status indicator */}
             <div className="flex items-center gap-4">
-              {/* Status indicator */}
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
                 <span className="text-sm text-muted-foreground">Live</span>
               </div>
             </div>
