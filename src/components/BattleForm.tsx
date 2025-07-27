@@ -7,12 +7,12 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Play, Code, PenTool, BarChart3, Sparkles, Globe, Brain, Clock, DollarSign } from "lucide-react";
 
 const categories = [
-  { id: "code", label: "Code", icon: Code, color: "bg-blue-500" },
-  { id: "writing", label: "Writing", icon: PenTool, color: "bg-purple-500" },
-  { id: "analysis", label: "Analysis", icon: BarChart3, color: "bg-green-500" },
-  { id: "creative", label: "Creative", icon: Sparkles, color: "bg-pink-500" },
-  { id: "translation", label: "Translation", icon: Globe, color: "bg-orange-500" },
-  { id: "other", label: "Other", icon: Brain, color: "bg-gray-500" },
+  { id: "code", label: "Code", icon: Code, color: "text-purple-400" },
+  { id: "writing", label: "Writing", icon: PenTool, color: "text-blue-400" },
+  { id: "analysis", label: "Analysis", icon: BarChart3, color: "text-emerald-400" },
+  { id: "creative", label: "Creative", icon: Sparkles, color: "text-pink-400" },
+  { id: "translation", label: "Translation", icon: Globe, color: "text-orange-400" },
+  { id: "other", label: "Other", icon: Brain, color: "text-gray-400" },
 ];
 
 const models = [
@@ -96,10 +96,7 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
           try {
             const responseData = JSON.parse(responseText);
             console.log("🔍 Dados parseados do webhook:", responseData);
-            console.log("🔍 Tipo de dados:", typeof responseData);
-            console.log("🔍 É array?", Array.isArray(responseData));
             
-            // ✅ PROCESSAR FORMATO ARRAY
             let processedData;
             if (Array.isArray(responseData) && responseData.length > 0) {
               processedData = responseData[0];
@@ -110,12 +107,6 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             }
             
             console.log("🔍 Keys disponíveis:", Object.keys(processedData));
-            console.log("🔍 Campos específicos:", {
-              retorno_juiz: processedData.retorno_juiz,
-              resposta_a: processedData.resposta_a,
-              resposta_b: processedData.resposta_b,
-              resposta_c: processedData.resposta_c
-            });
 
             setDebugInfo(`✅ Connection successful!\n\nFormat: ${Array.isArray(responseData) ? 'Array' : 'Object'}\nFields: ${Object.keys(processedData).join(', ')}`);
             
@@ -155,21 +146,21 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
   }, 0);
 
   return (
-    <div className="space-apple-lg">
+    <div className="space-minimal-lg">
       {/* Header */}
-      <div className="text-center space-apple-md">
-        <h1 className="text-apple-title">New Comparison</h1>
-        <p className="text-apple-body max-w-2xl mx-auto">
+      <div className="text-center space-minimal-md">
+        <h1 className="text-minimal-title text-gradient-purple">New Comparison</h1>
+        <p className="text-minimal-body max-w-2xl mx-auto">
           Compare responses from different AI models and vote for the best one
         </p>
       </div>
 
       <div className="max-w-4xl mx-auto">
-        <Card className="card-apple">
-          <CardContent className="p-8 space-apple-lg">
+        <Card className="card-minimal">
+          <CardContent className="p-8 space-minimal-lg">
             {/* Debug Info */}
             {debugInfo && (
-              <div className={`rounded-xl p-4 text-sm ${
+              <div className={`rounded-xl p-4 text-sm border ${
                 debugInfo.includes('✅ Connection successful') 
                   ? 'status-success' 
                   : 'status-warning'
@@ -180,7 +171,7 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             )}
 
             {/* Prompt Input */}
-            <div className="space-apple-sm">
+            <div className="space-minimal-sm">
               <label className="block text-sm font-medium text-foreground mb-3">
                 Your prompt
               </label>
@@ -188,15 +179,15 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
                 placeholder="Enter your prompt here... e.g., Write a Python function to calculate fibonacci numbers"
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                className="input-apple min-h-[120px] resize-none"
+                className="input-minimal min-h-[120px] resize-none scrollbar-minimal"
               />
-              <div className="text-apple-caption mt-2">
+              <div className="text-minimal-caption mt-2">
                 {prompt.length}/1000 characters
               </div>
             </div>
 
             {/* Categories */}
-            <div className="space-apple-sm">
+            <div className="space-minimal-sm">
               <label className="block text-sm font-medium text-foreground mb-3">
                 Category
               </label>
@@ -207,15 +198,17 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
                     <button
                       key={category.id}
                       onClick={() => setSelectedCategory(category.id)}
-                      className={`btn-apple p-4 justify-start gap-3 transition-all ${
+                      className={`btn-minimal p-4 justify-start gap-3 transition-all ${
                         selectedCategory === category.id 
-                          ? 'btn-apple-primary' 
-                          : 'btn-apple-secondary'
+                          ? 'btn-minimal-primary' 
+                          : 'btn-minimal-secondary hover:bg-secondary'
                       }`}
                     >
-                      <div className={`p-2 rounded-lg ${category.color} bg-opacity-10`}>
-                        <IconComponent className={`w-4 h-4 ${category.color.replace('bg-', 'text-')}`} />
-                      </div>
+                      <IconComponent className={`w-5 h-5 ${
+                        selectedCategory === category.id 
+                          ? 'text-white' 
+                          : category.color
+                      }`} />
                       <span className="font-medium">{category.label}</span>
                     </button>
                   );
@@ -224,7 +217,7 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             </div>
 
             {/* Model Selection */}
-            <div className="space-apple-sm">
+            <div className="space-minimal-sm">
               <label className="block text-sm font-medium text-foreground mb-3">
                 Select models to compare
               </label>
@@ -233,16 +226,16 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
                   <div
                     key={model.id}
                     onClick={() => handleModelToggle(model.id)}
-                    className={`card-apple p-4 cursor-pointer transition-all ${
+                    className={`card-minimal p-4 cursor-pointer transition-all border ${
                       selectedModels.includes(model.id)
-                        ? 'ring-2 ring-primary bg-primary/5'
-                        : 'hover:bg-secondary/50'
+                        ? 'ring-2 ring-primary bg-primary/10 border-primary/30'
+                        : 'hover:bg-secondary/30 border-border/30'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <Checkbox checked={selectedModels.includes(model.id)} />
                       <div className={`w-3 h-3 rounded-full ${model.color}`} />
-                      <span className="font-medium flex-1">{model.name}</span>
+                      <span className="font-medium flex-1 text-foreground">{model.name}</span>
                       <div className="flex items-center gap-1 text-muted-foreground text-sm">
                         <DollarSign className="w-3 h-3" />
                         <span>{model.cost.toFixed(3)}</span>
@@ -254,16 +247,16 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             </div>
 
             {/* Summary */}
-            <div className="card-apple p-4 bg-secondary/30">
+            <div className="card-minimal p-4 gradient-purple-subtle border border-primary/20">
               <div className="flex justify-between items-center text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">Models selected:</span>
-                  <Badge variant="outline">{selectedModels.length}</Badge>
+                  <span className="font-medium text-foreground">Models selected:</span>
+                  <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30">{selectedModels.length}</Badge>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">Est. cost:</span>
-                  <span className="font-mono">${totalCost.toFixed(3)}</span>
+                  <span className="font-medium text-foreground">Est. cost:</span>
+                  <span className="font-mono text-primary">${totalCost.toFixed(3)}</span>
                 </div>
               </div>
             </div>
@@ -272,14 +265,14 @@ export default function BattleForm({ onStartBattle }: BattleFormProps) {
             <button
               onClick={handleStartBattle}
               disabled={!prompt.trim() || selectedModels.length < 2 || isLoading}
-              className="btn-apple-primary w-full h-14 text-base font-medium gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-minimal-primary w-full h-14 text-base font-medium gap-3 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/25"
             >
               <Play className="w-5 h-5" />
               {isLoading ? "Starting comparison..." : "Start Comparison"}
             </button>
             
             {selectedModels.length < 2 && (
-              <p className="text-apple-caption text-center">
+              <p className="text-minimal-caption text-center">
                 Select at least 2 models to start the comparison
               </p>
             )}
