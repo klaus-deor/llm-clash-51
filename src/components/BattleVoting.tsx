@@ -2,15 +2,15 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, DollarSign, ThumbsUp, Eye, Sparkles } from "lucide-react";
+import { Clock, DollarSign, Heart, Eye, CheckCircle } from "lucide-react";
 
 interface BattleResponse {
   id: string;
   content: string;
   responseTime: number;
   cost: number;
-  modelName?: string; // Hidden until voting is complete
-  position: string; // A, B, C
+  modelName?: string;
+  position: string;
 }
 
 interface BattleVotingProps {
@@ -43,21 +43,20 @@ export default function BattleVoting({
     onReveal();
   };
 
-  // ✅ PROCESSAR FORMATO CORRETO DO WEBHOOK (resposta_a, resposta_b, resposta_c)
   const parseWebhookResponses = (webhookResponses: any) => {
     const fixedResponses: BattleResponse[] = [];
     
     if (!webhookResponses) {
-      console.log("⚠️ Nenhuma resposta do webhook encontrada");
+      console.log("⚠️ No webhook responses found");
       return [];
     }
     
-    console.log("🔍 Processando respostas do webhook:", webhookResponses);
+    console.log("🔍 Processing webhook responses:", webhookResponses);
     
-    // RESPOSTA A
+    // Response A
     if (webhookResponses.resposta_a) {
       const cleanContent = webhookResponses.resposta_a
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
       
       if (cleanContent) {
@@ -66,16 +65,16 @@ export default function BattleVoting({
           content: cleanContent,
           responseTime: 2.1,
           cost: 0.015,
-          modelName: "Modelo A", // Será revelado após votação
+          modelName: "Model A",
           position: "A"
         });
       }
     }
     
-    // RESPOSTA B
+    // Response B
     if (webhookResponses.resposta_b) {
       const cleanContent = webhookResponses.resposta_b
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
       
       if (cleanContent) {
@@ -84,16 +83,16 @@ export default function BattleVoting({
           content: cleanContent,
           responseTime: 2.3,
           cost: 0.02,
-          modelName: "Modelo B", // Será revelado após votação
+          modelName: "Model B",
           position: "B"
         });
       }
     }
     
-    // RESPOSTA C
+    // Response C
     if (webhookResponses.resposta_c) {
       const cleanContent = webhookResponses.resposta_c
-        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .replace(/<think>[\s\S]*?<\/think>/g, '')
         .trim();
       
       if (cleanContent) {
@@ -102,24 +101,22 @@ export default function BattleVoting({
           content: cleanContent,
           responseTime: 1.8,
           cost: 0.018,
-          modelName: "Modelo C", // Será revelado após votação
+          modelName: "Model C",
           position: "C"
         });
       }
     }
     
-    // Debug: Log para verificar mapeamento
-    console.log("🔍 Mapeamento de Respostas processadas:", {
+    console.log("🔍 Processed responses mapping:", {
       "A": !!webhookResponses.resposta_a ? "✅" : "❌",
       "B": !!webhookResponses.resposta_b ? "✅" : "❌", 
       "C": !!webhookResponses.resposta_c ? "✅" : "❌",
-      "Total processadas": fixedResponses.length
+      "Total processed": fixedResponses.length
     });
     
     return fixedResponses;
   };
 
-  // Use processed responses if available, otherwise use provided responses
   const processedResponses = responses.length > 0 && responses[0].position 
     ? responses 
     : parseWebhookResponses(responses);
@@ -129,181 +126,203 @@ export default function BattleVoting({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto space-y-6">
-      {/* Battle Info */}
-      <Card className="bg-gradient-battle border-primary/20">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
-            Vote na Melhor Resposta
-            <Badge variant="outline" className="ml-auto">
-              {category}
-            </Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="bg-muted/30 p-4 rounded-lg">
-            <p className="font-medium text-sm text-muted-foreground mb-2">Prompt:</p>
-            <p className="text-foreground">{prompt}</p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-apple-lg">
+      {/* Header */}
+      <div className="text-center space-apple-md">
+        <h1 className="text-apple-title">Choose the Best Response</h1>
+        <p className="text-apple-body max-w-2xl mx-auto">
+          Vote for the response you think is best. Models are hidden until you reveal them.
+        </p>
+      </div>
 
-      {/* Debug Info */}
-      {processedResponses.length === 0 && (
-        <Card className="border-amber-500/20 bg-amber-50/10">
-          <CardContent className="pt-6">
-            <div className="text-amber-600 text-sm space-y-2">
-              <p className="font-semibold">⚠️ Nenhuma resposta processada</p>
-              <p>Possíveis causas:</p>
-              <ul className="list-disc list-inside ml-4 space-y-1">
-                <li>Webhook retornou formato diferente do esperado</li>
-                <li>Campos resposta_a, resposta_b, resposta_c não encontrados</li>
-                <li>Erro na comunicação com o webhook</li>
-              </ul>
-              <p className="mt-2">Verifique o console do browser para mais detalhes.</p>
+      {/* Prompt Display */}
+      <div className="max-w-4xl mx-auto">
+        <Card className="card-apple">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-apple-subtitle">Prompt</h3>
+              <Badge variant="outline" className="rounded-full">
+                {category}
+              </Badge>
+            </div>
+            <div className="card-apple p-4 bg-secondary/30">
+              <p className="text-apple-body">{prompt}</p>
             </div>
           </CardContent>
         </Card>
+      </div>
+
+      {/* Status Messages */}
+      {processedResponses.length === 0 && (
+        <div className="max-w-4xl mx-auto">
+          <Card className="card-apple">
+            <CardContent className="p-6">
+              <div className="status-warning rounded-xl p-4">
+                <div className="font-medium mb-2">⚠️ No responses processed</div>
+                <p className="text-sm">
+                  Check the browser console for debugging information.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
-      {/* Success Info */}
       {processedResponses.length > 0 && (
-        <Card className="border-green-500/20 bg-green-50/10">
-          <CardContent className="pt-6">
-            <div className="text-green-600 text-sm">
-              <p className="font-semibold">✅ Webhook funcionando corretamente!</p>
-              <p>Encontradas {processedResponses.length} respostas válidas para comparação.</p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="max-w-4xl mx-auto">
+          <Card className="card-apple">
+            <CardContent className="p-6">
+              <div className="status-success rounded-xl p-4">
+                <div className="font-medium mb-1">✅ Responses ready</div>
+                <p className="text-sm">
+                  Found {processedResponses.length} responses for comparison.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Responses Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        {processedResponses.map((response) => (
-          <Card
-            key={response.id}
-            className={`relative transition-all duration-300 hover:shadow-battle ${
-              selectedVote === response.id
-                ? 'border-primary shadow-glow scale-105'
-                : 'border-border hover:border-primary/40'
-            }`}
-          >
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center justify-between">
-                <span className="text-lg">Resposta {getResponseLabel(response)}</span>
-                {showReveal && response.modelName && (
-                  <Badge className="bg-primary text-primary-foreground">
-                    {response.modelName}
-                  </Badge>
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {processedResponses.map((response) => (
+            <Card 
+              key={response.id}
+              className={`card-apple transition-all duration-300 cursor-pointer ${
+                selectedVote === response.id
+                  ? 'ring-2 ring-primary bg-primary/5 scale-[1.02]'
+                  : 'hover:scale-[1.01] hover:shadow-lg'
+              }`}
+              onClick={() => !votingComplete && !selectedVote && handleVote(response.id)}
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center justify-between">
+                  <span className="text-lg font-semibold">
+                    Response {getResponseLabel(response)}
+                  </span>
+                  {showReveal && response.modelName && (
+                    <Badge className="bg-primary text-primary-foreground rounded-full">
+                      {response.modelName}
+                    </Badge>
+                  )}
+                  {selectedVote === response.id && (
+                    <CheckCircle className="w-5 h-5 text-primary" />
+                  )}
+                </CardTitle>
+              </CardHeader>
+              
+              <CardContent className="space-apple-sm">
+                {/* Response Content */}
+                <div className="card-apple p-4 bg-secondary/30 max-h-80 overflow-y-auto scrollbar-apple">
+                  <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
+                    {response.content}
+                  </div>
+                </div>
+
+                {/* Metrics */}
+                <div className="flex justify-between items-center text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    <span>{response.responseTime.toFixed(1)}s</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <DollarSign className="w-4 h-4" />
+                    <span>${response.cost.toFixed(3)}</span>
+                  </div>
+                </div>
+
+                {/* Vote Button */}
+                {!votingComplete && !selectedVote && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleVote(response.id);
+                    }}
+                    className="btn-apple-primary w-full gap-2"
+                  >
+                    <Heart className="w-4 h-4" />
+                    Vote for this
+                  </button>
                 )}
-              </CardTitle>
-            </CardHeader>
-            
-            <CardContent className="space-y-4">
-              {/* Response Content */}
-              <div className="bg-muted/30 p-4 rounded-lg max-h-64 overflow-y-auto">
-                <div className="whitespace-pre-wrap text-sm text-foreground">
-                  {response.content}
-                </div>
-              </div>
 
-              {/* Metrics */}
-              <div className="flex justify-between items-center text-sm">
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{response.responseTime.toFixed(1)}s</span>
-                </div>
-                <div className="flex items-center gap-1 text-muted-foreground">
-                  <DollarSign className="w-4 h-4" />
-                  <span>${response.cost.toFixed(3)}</span>
-                </div>
-              </div>
+                {/* Selected State */}
+                {selectedVote === response.id && !showReveal && (
+                  <div className="status-success rounded-xl p-3 text-center">
+                    <CheckCircle className="w-5 h-5 mx-auto mb-1" />
+                    <div className="font-medium text-sm">Your Choice</div>
+                  </div>
+                )}
 
-              {/* Vote Button */}
-              {!votingComplete && (
-                <Button
-                  variant={selectedVote === response.id ? "default" : "vote"}
-                  onClick={() => handleVote(response.id)}
-                  disabled={selectedVote !== null && selectedVote !== response.id}
-                  className="w-full"
-                >
-                  <ThumbsUp className="w-4 h-4" />
-                  {selectedVote === response.id ? 'Voto Confirmado!' : 'Votar'}
-                </Button>
-              )}
-
-              {/* Winner Badge */}
-              {votingComplete && selectedVote === response.id && (
-                <Badge className="w-full justify-center bg-arena-gold text-background font-bold">
-                  🏆 Sua Escolha Vencedora
-                </Badge>
-              )}
-            </CardContent>
-          </Card>
-        ))}
+                {/* Winner Badge */}
+                {votingComplete && selectedVote === response.id && (
+                  <div className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-3 text-center font-medium">
+                    🏆 Your Winner
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
 
       {/* Reveal Button */}
       {selectedVote && !showReveal && processedResponses.length > 0 && (
         <div className="text-center">
-          <Button
-            variant="arena"
-            size="lg"
+          <button
             onClick={handleReveal}
-            className="text-lg px-8"
+            className="btn-apple-secondary px-8 py-4 text-base gap-3"
           >
             <Eye className="w-5 h-5" />
-            Revelar Modelos
-          </Button>
+            Reveal Models
+          </button>
         </div>
       )}
 
-      {/* Post-Voting Info */}
+      {/* Post-Voting Summary */}
       {showReveal && (
-        <Card className="bg-gradient-battle border-primary/20">
-          <CardContent className="pt-6">
-            <div className="text-center space-y-4">
-              <h3 className="text-xl font-bold text-primary">
-                🎉 Votação Concluída!
-              </h3>
-              <p className="text-muted-foreground">
-                Obrigado por contribuir para melhorar nossos rankings! 
-                Seus dados ajudam outros usuários a escolher o melhor modelo.
-              </p>
+        <div className="max-w-4xl mx-auto">
+          <Card className="card-apple">
+            <CardContent className="p-8 text-center space-apple-md">
+              <div className="space-apple-sm">
+                <h3 className="text-apple-title">🎉 Comparison Complete!</h3>
+                <p className="text-apple-body">
+                  Thank you for contributing to our AI model rankings.
+                  Your vote helps others choose the best model for their needs.
+                </p>
+              </div>
               
               {/* Results Summary */}
-              <div className="bg-muted/30 rounded-lg p-4 mt-4">
-                <h4 className="font-semibold mb-2">📊 Resumo da Batalha:</h4>
+              <div className="card-apple p-6 bg-secondary/30">
+                <h4 className="font-semibold mb-4">Comparison Summary</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                   <div className="text-center">
-                    <div className="font-semibold">Resposta A</div>
-                    <div className="text-muted-foreground">Modelo A</div>
+                    <div className="font-semibold">Response A</div>
+                    <div className="text-muted-foreground">Model A</div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold">Resposta B</div>
-                    <div className="text-muted-foreground">Modelo B</div>
+                    <div className="font-semibold">Response B</div>
+                    <div className="text-muted-foreground">Model B</div>
                   </div>
                   <div className="text-center">
-                    <div className="font-semibold">Resposta C</div>
-                    <div className="text-muted-foreground">Modelo C</div>
+                    <div className="font-semibold">Response C</div>
+                    <div className="text-muted-foreground">Model C</div>
                   </div>
                 </div>
               </div>
               
-              <div className="flex flex-wrap justify-center gap-4 mt-6">
-                <Button variant="battle">
-                  <Sparkles className="w-4 h-4" />
-                  Nova Batalha
-                </Button>
-                <Button variant="arena">
-                  Ver Rankings Atualizados
-                </Button>
+              <div className="flex flex-wrap justify-center gap-4">
+                <button className="btn-apple-primary gap-2">
+                  <Heart className="w-4 h-4" />
+                  New Comparison
+                </button>
+                <button className="btn-apple-secondary gap-2">
+                  View Rankings
+                </button>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
     </div>
   );
