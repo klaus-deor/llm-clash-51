@@ -10,7 +10,7 @@ import { Zap, Trophy, User, Brain } from "lucide-react";
 // Mock data for battle simulation - ONLY used as fallback
 const mockResponses = [
   {
-    id: "response1",
+    id: "response-a",
     content: `def fibonacci(n):
     if n <= 1:
         return n
@@ -26,11 +26,11 @@ def fibonacci_memo(n, memo={}):
     return memo[n]`,
     responseTime: 2.3,
     cost: 0.03,
-    modelName: "GPT-4 Turbo",
+    modelName: "Modelo A",
     position: "A"
   },
   {
-    id: "response2", 
+    id: "response-b", 
     content: `def fibonacci(n):
     """Calculate Fibonacci number using iterative approach."""
     if n <= 1:
@@ -49,11 +49,11 @@ def fibonacci_sequence(limit):
         a, b = b, a + b`,
     responseTime: 1.8,
     cost: 0.02,
-    modelName: "Claude-3 Opus",
+    modelName: "Modelo B",
     position: "B"
   },
   {
-    id: "response3",
+    id: "response-c",
     content: `def fibonacci(n):
     # Base cases
     if n == 0:
@@ -75,7 +75,7 @@ def fibonacci_sequence(limit):
 print(f"10th Fibonacci number: {fibonacci(10)}")`,
     responseTime: 3.1,
     cost: 0.01,
-    modelName: "Gemini Ultra",
+    modelName: "Modelo C",
     position: "C"
   }
 ];
@@ -86,45 +86,73 @@ const Index = () => {
   const [currentBattle, setCurrentBattle] = useState<any>(null);
   const [selectedRankingCategory, setSelectedRankingCategory] = useState("code");
 
-  // ✅ FUNÇÃO PARA PROCESSAR DADOS REAIS DO WEBHOOK
+  // ✅ FUNÇÃO PARA PROCESSAR DADOS REAIS DO WEBHOOK (formato correto)
   const parseWebhookResponses = (webhookResponses: any) => {
-    if (!webhookResponses) return [];
+    if (!webhookResponses) {
+      console.log("⚠️ Nenhuma resposta do webhook para processar");
+      return [];
+    }
+    
+    console.log("🔍 Processando respostas do webhook no Index:", webhookResponses);
     
     const responses = [];
     
-    // MAPEAMENTO FIXO: A=DeepSeek, B=GPT, C=Claude
-    if (webhookResponses.resposta_deepseek) {
-      responses.push({
-        id: "response-a-deepseek",
-        content: webhookResponses.resposta_deepseek.trim(),
-        responseTime: 2.1,
-        cost: 0.005,
-        modelName: "DeepSeek",
-        position: "A"
-      });
+    // MAPEAMENTO CORRETO: A, B, C baseado no formato do webhook
+    if (webhookResponses.resposta_a) {
+      const cleanContent = webhookResponses.resposta_a
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+        
+      if (cleanContent) {
+        responses.push({
+          id: "response-a",
+          content: cleanContent,
+          responseTime: 2.1,
+          cost: 0.015,
+          modelName: "Modelo A",
+          position: "A"
+        });
+      }
     }
     
-    if (webhookResponses.resposta_gpt) {
-      responses.push({
-        id: "response-b-gpt",
-        content: webhookResponses.resposta_gpt.trim(),
-        responseTime: 2.3,
-        cost: 0.03,
-        modelName: "GPT-4",
-        position: "B"
-      });
+    if (webhookResponses.resposta_b) {
+      const cleanContent = webhookResponses.resposta_b
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+        
+      if (cleanContent) {
+        responses.push({
+          id: "response-b",
+          content: cleanContent,
+          responseTime: 2.3,
+          cost: 0.02,
+          modelName: "Modelo B",
+          position: "B"
+        });
+      }
     }
     
-    if (webhookResponses.resposta_claude) {
-      responses.push({
-        id: "response-c-claude",
-        content: webhookResponses.resposta_claude.trim(),
-        responseTime: 1.8,
-        cost: 0.02,
-        modelName: "Claude-3",
-        position: "C"
-      });
+    if (webhookResponses.resposta_c) {
+      const cleanContent = webhookResponses.resposta_c
+        .replace(/<think>[\s\S]*?<\/think>/g, '') // Remove tags <think>
+        .trim();
+        
+      if (cleanContent) {
+        responses.push({
+          id: "response-c",
+          content: cleanContent,
+          responseTime: 1.8,
+          cost: 0.018,
+          modelName: "Modelo C",
+          position: "C"
+        });
+      }
     }
+    
+    console.log("✅ Respostas processadas no Index:", {
+      total: responses.length,
+      positions: responses.map(r => r.position)
+    });
     
     return responses;
   };
@@ -139,9 +167,15 @@ const Index = () => {
       // Processar dados reais do webhook
       responses = parseWebhookResponses(battleData.responses);
       console.log("✅ Usando dados reais do webhook:", responses);
+      
+      // Se não conseguiu processar nenhuma resposta, usar fallback
+      if (responses.length === 0) {
+        console.log("⚠️ Nenhuma resposta válida processada, usando fallback mock");
+        responses = mockResponses.slice(0, 3); // Sempre 3 respostas A, B, C
+      }
     } else {
-      // Fallback para dados mock apenas se webhook falhar
-      responses = mockResponses.slice(0, battleData.selectedModels.length);
+      // Fallback para dados mock apenas se webhook falhar completamente
+      responses = mockResponses.slice(0, 3); // Sempre 3 respostas A, B, C
       console.log("⚠️ Usando dados mock (webhook falhou):", responses);
     }
     
@@ -153,8 +187,10 @@ const Index = () => {
   };
 
   const handleVote = (responseId: string) => {
-    // Handle vote logic
-    console.log("Voted for:", responseId);
+    console.log("🗳️ Voto registrado para:", responseId);
+    
+    // Aqui você pode implementar lógica para salvar o voto
+    // Por exemplo, enviar para um backend ou analytics
   };
 
   const handleReveal = () => {
@@ -227,6 +263,18 @@ const Index = () => {
                 onReveal={handleReveal}
                 votingComplete={true}
               />
+            )}
+            
+            {/* Botão para nova batalha quando completada */}
+            {battleState === "completed" && (
+              <div className="text-center">
+                <button
+                  onClick={handleNewBattle}
+                  className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  🔄 Nova Batalha
+                </button>
+              </div>
             )}
           </TabsContent>
 
